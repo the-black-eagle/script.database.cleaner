@@ -368,9 +368,7 @@ if addon:
 			my_command = my_command + exclude_command
 					
 # Build SQL query	
-
-		
-			
+	
 		
 		sql = """DELETE
 FROM files WHERE idPath IN (
@@ -382,6 +380,11 @@ OR strPath LIKE 'http://%'
 ) AND (""" + my_command + """)
 ));"""
 
+
+		if my_command:
+			sql = """DELETE FROM files WHERE idPath IN ( SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath LIKE 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%') AND (""" + my_command + """)));"""
+		else:
+			sql = """DELETE FROM files WHERE idPath IN (SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath LIKE 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%')));"""
 			
 	if debugging:
 		log('SQL command is %s' % sql)
