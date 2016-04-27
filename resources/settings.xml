@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <category label="32001">
+		<setting type="lsep"/>
+        <setting id="pvr" label="32002" type="bool" default="false"/>
+        <setting id="bookmark" label="32006" type="bool" default="false"/>
+        <setting id="autoclean" label="32003" type="bool" default="true"/>
+        <setting id="autobackup" label="32015" type="bool" default="true"/>
+        <setting id="backupname" label="32016" type="text" default="" enable="eq(-1,true)"/>
+        <setting type="sep"/>
+        <setting label="32004" type="lsep"/>
+        <setting id="promptdelete" label="32007" type="bool" default="true"/>
+        <setting id="debugging" label="32005" type="bool" default="false"/>
+    </category>
+    <category label="32010">
+		<setting type="lsep"/>
+		<setting id="usesources" label="32012" type="bool" default="true"/>
+		<setting id="localsource" label="32013" type="bool" default="true" enable="eq(-1,true)"/>
+		<setting label="32014" type="lsep"/>
+		<setting id="sourcefilepath" label="32011" type="file" default="" enable="eq(-3,true)+eq(-2,false)"/>
+    </category>
+    <category label="32017">
+    <setting type="lsep"/>
+    <setting id="overridedb" label="32018" type="bool" default="false"/>
+    <setting id="forceddbname" label="32019" type="text" default="" enable="eq(-1,true)"/>
+    </category>
+</settings>

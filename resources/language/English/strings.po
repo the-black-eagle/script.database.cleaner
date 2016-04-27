@@ -1,0 +1,85 @@
+# XBMC Media Center language file
+# Addon Name: Kodi Video Database Cleaner
+# Addon id: script.database.cleaner
+# Addon Provider: black_eagle
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC Addons\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: XBMC Translation Team\n"
+"Language-Team: English (http://www.transifex.com/projects/p/xbmc-addons/language/en/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#32001"
+msgid "General Settings"
+msgstr ""
+
+msgctxt "#32002"
+msgid "Keep any PVR information"
+msgstr ""
+
+msgctxt "#32003"
+msgid "Automatically trigger clean library"
+msgstr ""
+
+msgctxt "#32004"
+msgid "Debug Settings"
+msgstr ""
+
+msgctxt "#32005"
+msgid "Enable Debugging"
+msgstr ""
+
+msgctxt "#32006"
+msgid "Keep any bookmarked files"
+msgstr ""
+
+msgctxt "#32007"
+msgid "Prompt before actually deleting anything"
+msgstr ""
+
+msgctxt "#32010"
+msgid "Sources"
+msgstr ""
+
+msgctxt "#32011"
+msgid "Path to remote sources.xml file"
+msgstr ""
+
+msgctxt "#32012"
+msgid "Use sources.xml to determine files to keep"
+msgstr ""
+
+msgctxt "#32013"
+msgid "Use sources.xml on this machine"
+msgstr ""
+
+msgctxt "#32014"
+msgid "MySQL users ONLY"
+msgstr ""
+
+msgctxt "#32015"
+msgid "Backup local database before cleaning"
+msgstr ""
+
+msgctxt "#32016"
+msgid " - Backup database name"
+msgstr ""
+
+msgctxt "#32017"
+msgid "Advanced"
+msgstr ""
+
+msgctxt "#32018"
+msgid "Force database name"
+msgstr ""
+
+msgctxt "#32019"
+msgid " - Forced database name"
+msgstr ""
