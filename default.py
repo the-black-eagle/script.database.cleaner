@@ -4,6 +4,8 @@
 #  script.video.cleaner
 #  Written by black_eagle and BatterPudding
 #
+# Version 27b/6 - Batter Pudding Fix added
+#
 #
 
 import datetime
@@ -88,7 +90,7 @@ def log(txt):
 	if isinstance(txt, str):
 		txt = txt.decode('utf-8')
 	message = u'%s: %s' % (addonname, txt)
-	xbmc.log(msg=message.encode('utf-8'), level=xbmc.LOGDEBUG)
+	xbmc.log(msg=message.encode('utf-8'), level=xbmc.LOGDEBUG)  
 
 
 if debugging:
@@ -99,6 +101,7 @@ our_dbname = 'MyVideos'
 for num in range(114, 35, -1):
 	testname = our_dbname + str(num)
 	our_test = db_path + testname + '.db'
+#	log('Checking for database %s' % testname) 
 	if debugging:
 		log('Checking for database %s' % testname)
 	if xbmcvfs.exists(our_test):
@@ -109,7 +112,7 @@ if num != 35:
 if our_dbname == 'MyVideos':
 	if debugging:
 		log('No video database found - assuming MySQL database')
-
+log('database name is %s' % our_dbname)
 if debugging:
 	log('Database name is %s' % our_dbname)
 
@@ -169,16 +172,16 @@ if addon:
 					our_password = videodb.find('pass').text
 				except:
 					log('Unable to determine MySQL password')
-			try:
-				our_dbname = videodb.find('name').text
-			except:
-				pass
-			if debugging:
-				log('MySQL details - %s, %s, %s' % (our_host, our_username, our_dbname))
-			is_mysql = True
+				try:
+					our_dbname = videodb.find('name').text
+				except:
+					pass
+				if debugging:
+					log('MySQL details - %s, %s, %s' % (our_host, our_username, our_dbname))
+				is_mysql = True
 		except:
 			is_mysql = False
-
+#	log ('Status of is_mysql is %s' % is_mysql)
 	if autobackup == 'true' and not is_mysql:
 		backup_path = xbmc.translatePath('special://database/backups/'
 				).decode('utf-8')
