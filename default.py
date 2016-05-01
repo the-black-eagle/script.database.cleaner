@@ -282,6 +282,7 @@ if addon:
 				log('Connected to forced MySQL database %s' % forcedname)
 		except:
 			log('Error connecting to forced	database - %s' % forcedname)
+			exit(1)
 	elif not is_mysql and not forcedbname:
 		try:
 			my_db_connector = db_path + our_dbname + '.db'
@@ -368,19 +369,6 @@ if addon:
 			my_command = my_command + exclude_command
 					
 # Build SQL query	
-	
-		
-		sql = """DELETE
-FROM files WHERE idPath IN (
-SELECT idPath FROM path WHERE (
-(strPath LIKE 'rtmp://%'
-OR strPath LIKE 'rtmpe:%'
-OR strPath LIKE 'plugin:%'
-OR strPath LIKE 'http://%'
-) AND (""" + my_command + """)
-));"""
-
-
 		if my_command:
 			sql = """DELETE FROM files WHERE idPath IN ( SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath LIKE 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%') AND (""" + my_command + """)));"""
 		else:
