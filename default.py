@@ -4,7 +4,7 @@
 #  script.video.cleaner
 #  Written by black_eagle and BatterPudding
 #
-# Version 27b/6 - Batter Pudding Fix added
+# Version 27b/7 - Batter Pudding Fix added
 #
 #
 
@@ -332,17 +332,19 @@ if addon:
 				log('Contents of sources.xml file')
 
 			for sources in video.findall('source'):
-				path_name = sources.find('name').text
-				the_path = sources.find('path').text
-				if debugging:
-					log('%s - %s' % (path_name, the_path))
-				if first_time:
-					first_time = False
-					our_source_list = 'Keeping source %s with path %s - ' % (path_name, the_path) 
-					my_command = "strPath NOT LIKE '" + the_path + "%'"
-				else:
-					our_source_list = our_source_list + 'source %s with path %s - ' % (path_name, the_path) 
-					my_command = my_command + " AND strPath NOT LIKE '" + the_path + "%'"
+				for path_name in sources.findall('name'):
+					the_path = path_name.text
+						for paths in sources.findall('path'):
+							the_path = paths.text
+							if debugging:
+								log('%s - %s' % (path_name, the_path))
+							if first_time:
+								first_time = False
+
+								my_command = "strPath NOT LIKE '" + the_path + "%'"
+							else:
+
+								my_command = my_command + " AND strPath NOT LIKE '" + the_path + "%'"
 			if path_name == '':
 				no_sources = True
 				if debugging:
@@ -415,9 +417,10 @@ if addon:
 		db.close()
 
 		if autoclean:
-			xbmcgui.Dialog().ok(addonname,
-								'Running built in library cleanup. Click OK to start'
-								)
+			xbmcgui.Dialog().notification(addonname,
+								'Running built in library cleanup. Click OK to start', xbmcgui.NOTIFICATION_INFO,
+								5000)
+			xbmc.sleep(5000)
 
 			json_query = \
 				xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "VideoLibrary.Clean","id": 1 }'
