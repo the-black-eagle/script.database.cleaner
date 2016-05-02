@@ -62,6 +62,7 @@ remote_file = False
 path_name = ''
 the_path = ''
 success = 0
+our_source_list = ''
 if debugging == 'true':
 	debugging = True
 else:
@@ -101,7 +102,7 @@ our_dbname = 'MyVideos'
 for num in range(114, 35, -1):
 	testname = our_dbname + str(num)
 	our_test = db_path + testname + '.db'
-#	log('Checking for database %s' % testname) 
+
 	if debugging:
 		log('Checking for database %s' % testname)
 	if xbmcvfs.exists(our_test):
@@ -181,7 +182,7 @@ if addon:
 				is_mysql = True
 		except:
 			is_mysql = False
-#	log ('Status of is_mysql is %s' % is_mysql)
+
 	if autobackup == 'true' and not is_mysql:
 		backup_path = xbmc.translatePath('special://database/backups/'
 				).decode('utf-8')
@@ -241,7 +242,6 @@ if addon:
 	# Open database connection
 
 	if is_mysql and not forcedbname:
-#		log('Our_dbname = %s testname = %s' %(our_dbname, testname))
 		if our_dbname == testname: # found an sqlite database, but no db name in advancedsettings
 			our_dbname = 'MyVideos'
 			for num in range(114, 35, -1):
@@ -338,10 +338,10 @@ if addon:
 					log('%s - %s' % (path_name, the_path))
 				if first_time:
 					first_time = False
-
+					our_source_list = 'Keeping source %s with path %s - ' % (path_name, the_path) 
 					my_command = "strPath NOT LIKE '" + the_path + "%'"
 				else:
-
+					our_source_list = our_source_list + 'source %s with path %s - ' % (path_name, the_path) 
 					my_command = my_command + " AND strPath NOT LIKE '" + the_path + "%'"
 			if path_name == '':
 				no_sources = True
@@ -353,23 +353,30 @@ if addon:
 
 		if is_pvr:
 			my_command = my_command + " AND strPath NOT LIKE 'pvr://%'"
+			our_source_list = our_source_list + 'Keeping PVR info '
 		if excluding:
 			my_command = my_command + exclude_command
+			our_source_list = our_source_list + 'Keeping items from excludes.xml '
 		if bookmarks:
 			my_command = my_command + ' AND idFile NOT IN (SELECT idFile FROM bookmark)'
+			our_source_list = our_source_list + 'Keeping bookmarked files '
 		sql = \
 			"""DELETE FROM files WHERE idPath IN(SELECT idPath FROM path where (""" + my_command + """));"""
 	if no_sources:
 		my_command = ''
+		our_source_list = 'NO SOURCES FOUND - REMOVING rtmp(e), plugin and http info '
 		custom_command = ''
 		if debugging:
 			log('Not using sources.xml')
 		if is_pvr:
 			my_command = my_command + " AND strPath NOT LIKE 'pvr://%'"
+			our_source_list = our_source_list + 'Keeping PVR info '
 		if bookmarks:
 			my_command = my_command + ' AND idFile NOT IN (SELECT idFile FROM bookmark)'
+			our_source_list = our_source_list + 'Keeping bookmarked files '
 		if excluding:
 			my_command = my_command + exclude_command
+			our_source_list = our_source_list + 'Keeping items from excludes.xml '
 					
 # Build SQL query	
 		if my_command:
@@ -379,8 +386,8 @@ if addon:
 			
 	if debugging:
 		log('SQL command is %s' % sql)
-	line1 = 'About to execute the following SQL'
-	line2 = sql
+	line1 = 'Please review the following and confirm if correct'
+	line2 = our_source_list
 	line3 = 'Are you sure ?'
 	if promptdelete:
 		dialog = xbmcgui.Dialog()
