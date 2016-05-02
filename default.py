@@ -334,17 +334,15 @@ if addon:
 			for sources in video.findall('source'):
 				for path_name in sources.findall('name'):
 					the_path = path_name.text
-						for paths in sources.findall('path'):
-							the_path = paths.text
-							if debugging:
-								log('%s - %s' % (path_name, the_path))
-							if first_time:
-								first_time = False
-
-								my_command = "strPath NOT LIKE '" + the_path + "%'"
-							else:
-
-								my_command = my_command + " AND strPath NOT LIKE '" + the_path + "%'"
+					for paths in sources.findall('path'):
+						the_path = paths.text
+						if debugging:
+							log('%s - %s' % (path_name, the_path))
+						if first_time:
+							first_time = False
+							my_command = "strPath NOT LIKE '" + the_path + "%'"
+						else:
+							my_command = my_command + " AND strPath NOT LIKE '" + the_path + "%'"
 			if path_name == '':
 				no_sources = True
 				if debugging:
