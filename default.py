@@ -198,18 +198,28 @@ if addon:
 		if debugging:
 			log('Remote sources.xml file path identified')
 	if xbmcvfs.exists(sources_file) and not remote_file:
-		source_file = sources_file
-		tree = ET.parse(source_file)
-		root = tree.getroot()
-		if debugging:
-			log('Got local sources.xml file')
+		try:
+			source_file = sources_file
+			tree = ET.parse(source_file)
+			root = tree.getroot()
+			if debugging:
+				log('Got local sources.xml file')
+		except:
+			log('Error parsing local sources.xml file')
+			xbmcgui.Dialog().ok(addonname, 'Error parsing local sources.xml file - script aborted')
+			exit(1)
 	elif xbmcvfs.exists(sources_file):
-		f = xbmcvfs.File(sources_file)
-		source_file = f.read()
-		f.close()
-		root = ET.fromstring(source_file)
-		if debugging:
-			log('Got remote sources.xml')
+		try:
+			f = xbmcvfs.File(sources_file)
+			source_file = f.read()
+			f.close()
+			root = ET.fromstring(source_file)
+			if debugging:
+				log('Got remote sources.xml')
+		except:
+			log('Error parsing remote sources.xml')
+			xbmcgui.Dialog().ok(addonname, 'Error parsing remote sources.xml file - script aborted')
+			exit(1)
 	else:
 		xbmcgui.Dialog().ok(addonname,
 							'Error - No sources.xml file found.  Please set the path to the remote sources.xml in the addon settings')
@@ -297,43 +307,51 @@ if addon:
 	if xbmcvfs.exists(excludes_file):
 		excluding = True
 		exclude_command = ''
-		tree = ET.parse(excludes_file)
-		er = tree.getroot()
-		for excludes in er.findall('exclude'):
-			to_exclude = excludes.text
-			if debugging:
-				log('Excluding plugin path - %s' % to_exclude)
-			exclude_command = exclude_command + " AND strPath NOT LIKE '" + to_exclude + "%'"
-		log('Parsed excludes.xml')
-			
+		try:
+			tree = ET.parse(excludes_file)
+			er = tree.getroot()
+			for excludes in er.findall('exclude'):
+				to_exclude = excludes.text
+				if debugging:
+					log('Excluding plugin path - %s' % to_exclude)
+				exclude_command = exclude_command + " AND strPath NOT LIKE '" + to_exclude + "%'"
+			log('Parsed excludes.xml')
+		except:
+			log('Error parsing excludes.xml')
+			xbmcgui.Dialog().ok(addonname, 'Error parsing excludes.xml file - script aborted')
+			exit(1)
 	
 	if not no_sources:
-		
-		for video in root.findall('video'):
-			if debugging:
-				log('Contents of sources.xml file')
-
-			for sources in video.findall('source'):
-				for path_name in sources.findall('name'):
-					the_path_name = path_name.text
-					for paths in sources.findall('path'):
-						the_path = paths.text
-						if debugging:
-							log('%s - %s' % (the_path_name, the_path))
-						if first_time:
-							first_time = False
-							my_command = "strPath NOT LIKE '" + the_path + "%'"
-							our_source_list = 'Keeping files in ' + the_path
-						else:
-							my_command = my_command + " AND strPath NOT LIKE '" + the_path + "%'"
-							our_source_list = our_source_list + ', ' + the_path
-			if path_name == '':
-				no_sources = True
+		try:
+			for video in root.findall('video'):
 				if debugging:
-					log('******* WARNING *******')
-					log('local sources.xml specified in settings')
-					log('But no sources found in sources.xml file')
-					log('Defaulting to alternate method for cleaning')
+					log('Contents of sources.xml file')
+	
+				for sources in video.findall('source'):
+					for path_name in sources.findall('name'):
+						the_path_name = path_name.text
+						for paths in sources.findall('path'):
+							the_path = paths.text
+							if debugging:
+								log('%s - %s' % (the_path_name, the_path))
+							if first_time:
+								first_time = False
+								my_command = "strPath NOT LIKE '" + the_path + "%'"
+								our_source_list = 'Keeping files in ' + the_path
+							else:
+								my_command = my_command + " AND strPath NOT LIKE '" + the_path + "%'"
+								our_source_list = our_source_list + ', ' + the_path
+				if path_name == '':
+					no_sources = True
+					if debugging:
+						log('******* WARNING *******')
+						log('local sources.xml specified in settings')
+						log('But no sources found in sources.xml file')
+						log('Defaulting to alternate method for cleaning')
+		except:
+			log('Error parsing sources.xml file')
+			xbmcgui.Dialog().ok(addonname, 'Error parsing sources.xml file - script aborted')
+			exit(1)
 
 		if is_pvr:
 			my_command = my_command + " AND strPath NOT LIKE 'pvr://%'"
