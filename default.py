@@ -68,24 +68,6 @@ if debugging == 'true':
 else:
 	debugging = False
 
-def get_installedversion():
-
-	# retrieve current installed version
-
-	json_query = \
-		xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Application.GetProperties", "params": {"properties": ["version", "name"]}, "id": 1 }'
-							)
-	json_query = unicode(json_query, 'utf-8', errors='ignore')
-	json_query = jsoninterface.loads(json_query)
-	if json_query.has_key('result') and json_query['result'
-			].has_key('version'):
-		major_version_installed = json_query['result']['version'
-				]['major']
-
-#        minor_version_installed = json_query['result']['version']['major']['minor']
-
-		return major_version_installed
-
 
 def log(txt):
 	if isinstance(txt, str):
@@ -333,16 +315,18 @@ if addon:
 
 			for sources in video.findall('source'):
 				for path_name in sources.findall('name'):
-					the_path = path_name.text
+					the_path_name = path_name.text
 					for paths in sources.findall('path'):
 						the_path = paths.text
 						if debugging:
-							log('%s - %s' % (path_name, the_path))
+							log('%s - %s' % (the_path_name, the_path))
 						if first_time:
 							first_time = False
 							my_command = "strPath NOT LIKE '" + the_path + "%'"
+							our_source_list = 'Keeping files in ' + the_path
 						else:
 							my_command = my_command + " AND strPath NOT LIKE '" + the_path + "%'"
+							our_source_list = our_source_list + ', ' + the_path
 			if path_name == '':
 				no_sources = True
 				if debugging:
@@ -365,7 +349,6 @@ if addon:
 	if no_sources:
 		my_command = ''
 		our_source_list = 'NO SOURCES FOUND - REMOVING rtmp(e), plugin and http info '
-		custom_command = ''
 		if debugging:
 			log('Not using sources.xml')
 		if is_pvr:
@@ -416,7 +399,7 @@ if addon:
 
 		if autoclean:
 			xbmcgui.Dialog().notification(addonname,
-								'Running built in library cleanup. Click OK to start', xbmcgui.NOTIFICATION_INFO,
+								'Running built in library cleanup', xbmcgui.NOTIFICATION_INFO,
 								5000)
 			xbmc.sleep(5000)
 
