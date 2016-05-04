@@ -393,6 +393,8 @@ if addon:
 	if promptdelete:
 		dialog = xbmcgui.Dialog()
 		i = dialog.yesno(addonname, line1, line2, line3)
+	else:
+		i = True
 	if i:
 		try:
 
