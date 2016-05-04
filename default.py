@@ -5,6 +5,7 @@
 #  Written by black_eagle and BatterPudding
 #
 # Version 27b/7 - Batter Pudding Fix added
+# Version 27b/9 - Batter Pudding tweaks the debug logging
 #
 #
 
@@ -74,10 +75,12 @@ def log(txt):
 		txt = txt.decode('utf-8')
 	message = u'%s: %s' % (addonname, txt)
 	xbmc.log(msg=message.encode('utf-8'), level=xbmc.LOGDEBUG)  
+	
+def dbglog(txt):
+	if debugging:
+		log(txt)
 
-
-if debugging:
-	log('script version %s started' % addonversion)
+dbglog('script version %s started' % addonversion)
 
 our_dbname = 'MyVideos'
 
@@ -85,19 +88,16 @@ for num in range(114, 35, -1):
 	testname = our_dbname + str(num)
 	our_test = db_path + testname + '.db'
 
-	if debugging:
-		log('Checking for database %s' % testname)
+	dbglog('Checking for database %s' % testname)
 	if xbmcvfs.exists(our_test):
 		break
 if num != 35:
 	our_dbname = testname
 
 if our_dbname == 'MyVideos':
-	if debugging:
-		log('No video database found - assuming MySQL database')
+	dbglog('No video database found - assuming MySQL database')
 log('database name is %s' % our_dbname)
-if debugging:
-	log('Database name is %s' % our_dbname)
+dbglog('Database name is %s' % our_dbname)
 
 if is_pvr == 'true':
 	is_pvr = True
@@ -121,18 +121,17 @@ if no_sources == 'true':
 else:
 	no_sources = True
 
-if debugging:
-	log('Settings for file cleaning are as follows')
-	if is_pvr:
-		log('keeping PVR files')
-	if bookmarks:
-		log('Keeping bookmarks')
-	if autoclean:
-		log('autocleaning afterwards')
-	if promptdelete:
-		log('Prompting before deletion')
-	if no_sources:
-		log('Not using sources.xml')
+dbglog('Settings for file cleaning are as follows')
+if is_pvr:
+	dbglog('keeping PVR files')
+if bookmarks:
+	dbglog('Keeping bookmarks')
+if autoclean:
+	dbglog('autocleaning afterwards')
+if promptdelete:
+	dbglog('Prompting before deletion')
+if no_sources:
+	dbglog('Not using sources.xml')
 
 if xbmcvfs.exists(advanced_file):
 	found = True
@@ -159,8 +158,7 @@ if addon:
 					our_dbname = videodb.find('name').text
 				except:
 					pass
-				if debugging:
-					log('MySQL details - %s, %s, %s' % (our_host, our_username, our_dbname))
+				dbglog('MySQL details - %s, %s, %s' % (our_host, our_username, our_dbname))
 				is_mysql = True
 		except:
 			is_mysql = False
@@ -170,8 +168,7 @@ if addon:
 				).decode('utf-8')
 
 		if not xbmcvfs.exists(backup_path):
-			if debugging:
-				log('Creating backup path %s' % backup_path)
+			dbglog('Creating backup path %s' % backup_path)
 			xbmcvfs.mkdir(backup_path)
 		now = datetime.datetime.now()
 		if forcedbname:
@@ -188,22 +185,19 @@ if addon:
 			success = 'successful'
 		else:
 			success = 'failed'
-		if debugging:
-			log('auto backup database %s.db to %s.db - result was %s'
-				% (our_dbname, backup_filename, success))
+		dbglog('auto backup database %s.db to %s.db - result was %s'
+			% (our_dbname, backup_filename, success))
 
 	if source_file_path != '':
 		sources_file = source_file_path
 		remote_file = True
-		if debugging:
-			log('Remote sources.xml file path identified')
+		dbglog('Remote sources.xml file path identified')
 	if xbmcvfs.exists(sources_file) and not remote_file:
 		try:
 			source_file = sources_file
 			tree = ET.parse(source_file)
 			root = tree.getroot()
-			if debugging:
-				log('Got local sources.xml file')
+			dbglog('Got local sources.xml file')
 		except:
 			log('Error parsing local sources.xml file')
 			xbmcgui.Dialog().ok(addonname, 'Error parsing local sources.xml file - script aborted')
@@ -214,8 +208,7 @@ if addon:
 			source_file = f.read()
 			f.close()
 			root = ET.fromstring(source_file)
-			if debugging:
-				log('Got remote sources.xml')
+			dbglog('Got remote sources.xml')
 		except:
 			log('Error parsing remote sources.xml')
 			xbmcgui.Dialog().ok(addonname, 'Error parsing remote sources.xml file - script aborted')
@@ -223,8 +216,7 @@ if addon:
 	else:
 		xbmcgui.Dialog().ok(addonname,
 							'Error - No sources.xml file found.  Please set the path to the remote sources.xml in the addon settings')
-		if debugging:
-			log('No local sources.xml, no path to remote sources file set in settings')
+		dbglog('No local sources.xml, no path to remote sources file set in settings')
 		exit(1)
 	my_command = ''
 	first_time = True
@@ -239,15 +231,13 @@ if addon:
 			for num in range(114, 35, -1):
 				testname = our_dbname + str(num)
 				try:
-					if debugging:
-						log('Attempting MySQL connection to %s' % testname)
+					dbglog('Attempting MySQL connection to %s' % testname)
 					db = mysql.connector.connect(user=our_username,
 							database=testname, password=our_password,
 							host=our_host)
 					if db.is_connected():
 						our_dbname = testname
-						if debugging:
-							log('Connected to MySQL database %s' % our_dbname)
+						dbglog('Connected to MySQL database %s' % our_dbname)
 						break
 				except:
 					pass
@@ -255,20 +245,17 @@ if addon:
 			for num in range(114, 35, -1):
 				testname = our_dbname + str(num)
 				try:
-					if debugging:
-						log('Attempting MySQL connection to %s' % testname)
+					dbglog('Attempting MySQL connection to %s' % testname)
 					db = mysql.connector.connect(user=our_username, database=testname, password=our_password, host=our_host)
 					if db.is_connected():
 						our_dbname = testname
-						if debugging:
-							log('Connected to MySQL database %s' % our_dbname)
+						dbglog('Connected to MySQL database %s' % our_dbname)
 						break
 				except:
 					pass
 			if not db.is_connected():
 				xbmcgui.Dialog().ok(addonname, "Couldn't connect to MySQL database", s)
-				if debugging:
-					log("Error - couldn't connect to MySQL database	- %s " % s)
+				dbglog("Error - couldn't connect to MySQL database	- %s " % s)
 				exit(1)
 	elif is_mysql and forcedbname:
 		try:
@@ -285,8 +272,7 @@ if addon:
 		except Exception,e:
 			s = str(e)
 			xbmcgui.Dialog().ok(addonname, 'Error connecting to SQLite database', s)
-			if debugging:
-				log('Error connecting to SQLite database - %s' % s)
+			dbglog('Error connecting to SQLite database - %s' % s)
 			exit(1)
 	else:
 		testpath = db_path + forcedname + '.db'
@@ -312,8 +298,7 @@ if addon:
 			er = tree.getroot()
 			for excludes in er.findall('exclude'):
 				to_exclude = excludes.text
-				if debugging:
-					log('Excluding plugin path - %s' % to_exclude)
+				dbglog('Excluding plugin path - %s' % to_exclude)
 				exclude_command = exclude_command + " AND strPath NOT LIKE '" + to_exclude + "%'"
 			log('Parsed excludes.xml')
 		except:
@@ -324,16 +309,14 @@ if addon:
 	if not no_sources:
 		try:
 			for video in root.findall('video'):
-				if debugging:
-					log('Contents of sources.xml file')
+				dbglog('Contents of sources.xml file')
 	
 				for sources in video.findall('source'):
 					for path_name in sources.findall('name'):
 						the_path_name = path_name.text
 						for paths in sources.findall('path'):
 							the_path = paths.text
-							if debugging:
-								log('%s - %s' % (the_path_name, the_path))
+							dbglog('%s - %s' % (the_path_name, the_path))
 							if first_time:
 								first_time = False
 								my_command = "strPath NOT LIKE '" + the_path + "%'"
@@ -343,11 +326,10 @@ if addon:
 								our_source_list = our_source_list + ', ' + the_path
 				if path_name == '':
 					no_sources = True
-					if debugging:
-						log('******* WARNING *******')
-						log('local sources.xml specified in settings')
-						log('But no sources found in sources.xml file')
-						log('Defaulting to alternate method for cleaning')
+					dbglog('******* WARNING *******')
+					dbglog('local sources.xml specified in settings')
+					dbglog('But no sources found in sources.xml file')
+					dbglog('Defaulting to alternate method for cleaning')
 		except:
 			log('Error parsing sources.xml file')
 			xbmcgui.Dialog().ok(addonname, 'Error parsing sources.xml file - script aborted')
@@ -367,8 +349,7 @@ if addon:
 	if no_sources:
 		my_command = ''
 		our_source_list = 'NO SOURCES FOUND - REMOVING rtmp(e), plugin and http info '
-		if debugging:
-			log('Not using sources.xml')
+		dbglog('Not using sources.xml')
 		if is_pvr:
 			my_command = my_command + " AND strPath NOT LIKE 'pvr://%'"
 			our_source_list = our_source_list + 'Keeping PVR info '
@@ -385,8 +366,7 @@ if addon:
 		else:
 			sql = """DELETE FROM files WHERE idPath IN (SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath LIKE 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%')));"""
 			
-	if debugging:
-		log('SQL command is %s' % sql)
+	dbglog('SQL command is %s' % sql)
 	line1 = 'Please review the following and confirm if correct'
 	line2 = our_source_list
 	line3 = 'Are you sure ?'
@@ -410,8 +390,7 @@ if addon:
 		# Rollback in case there is any error
 
 			db.rollback()
-			if debugging:
-				log('Error in db commit. Transaction rolled back')
+			dbglog('Error in db commit. Transaction rolled back')
 
 	# disconnect from server
 
@@ -429,16 +408,13 @@ if addon:
 			json_query = unicode(json_query, 'utf-8', errors='ignore')
 			json_query = jsoninterface.loads(json_query)
 			if json_query.has_key('result'):
-				if debugging:
-					log('Clean library sucessfully called')
+				dbglog('Clean library sucessfully called')
 		else:
 			xbmcgui.Dialog().ok(addonname,
 								'Script finished.  You should run clean library for best results'
 								)
-		if debugging:
-			log('Script finished')
+		dbglog('Script finished')
 	else:
 		xbmcgui.Dialog().ok(addonname, 'Script aborted by user')
-		if debugging:
-			log('script aborted by user - no changes made')
+		dbglog('script aborted by user - no changes made')
 		exit(1)
