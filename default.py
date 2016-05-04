@@ -5,6 +5,7 @@
 #  Written by black_eagle and BatterPudding
 #
 # Version 27b/7 - Batter Pudding Fix added
+# Version 27b/9 - Batter Pudding tweaks the debug logging
 #
 #
 
@@ -74,10 +75,14 @@ def log(txt):
 		txt = txt.decode('utf-8')
 	message = u'%s: %s' % (addonname, txt)
 	xbmc.log(msg=message.encode('utf-8'), level=xbmc.LOGDEBUG)  
+	
+def dbglog(txt):
+	if debugging:
+		log(txt)
 
-
-if debugging:
-	log('script version %s started' % addonversion)
+#if debugging:
+#	log('script version %s started' % addonversion)
+dbglog('script version %s started' % addonversion)
 
 our_dbname = 'MyVideos'
 
