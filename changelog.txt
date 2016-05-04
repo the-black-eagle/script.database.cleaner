@@ -1,3 +1,12 @@
+Version 0.5.2  4/5/16
+
+[Fix] Turning off 'prompt before delete' in settings caused an error
+[Fix] Incorrect variable name in debugging routine
+[Remove] Un-needed code section and unused variables
+[Add] More error handling when reading sources and excludes xml files
+[Change] Don't display the SQL statement, rather display a list of paths
+		 and other items set to be retained
+
 Version 0.5.1
 
 [Fix] Handle multiple paths for one source entry in sources.xml
