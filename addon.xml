@@ -4,7 +4,7 @@
       version="0.5.2"
       provider-name="black_eagle, BatterPudding.">
   <requires>
-    <import addon="xbmc.python" version="2.19.0"/>
+    <import addon="xbmc.python" version="2.1.0"/>
     <import addon="script.module.myconnpy" version="1.1.7"/>
   </requires>
   <extension point="xbmc.python.script"
