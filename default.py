@@ -27,6 +27,102 @@ import xbmcgui
 
 import xbmcvfs
 
+ACTION_PREVIOUS_MENU = 10
+ACTION_SELECT_ITEM = 7
+ACTION_NAV_BACK = 92
+flag = 0
+
+class MyClass(xbmcgui.Window):
+	def __init__( self ):
+		self.scaleX = self.getWidth()
+		self.centre = int(self.scaleX / 2)
+		log('Centre is %d ' %self.centre)
+		self.strActionInfo = xbmcgui.ControlLabel( ( 720 - 184 ), 10, 400, 200, '', 'font13', '0xFFFF00FF')
+		self.addControl(self.strActionInfo)
+		self.strActionInfo.setLabel('DATABASE CLEANER - INFO')
+		self.offset = 10
+	#		List paths from sources.xml 
+		self.display_list = display_list
+		self.strActionInfo = xbmcgui.ControlLabel(100, 120, 400, 200, '', 'font13', '0xFFFF00FF')
+		self.addControl(self.strActionInfo)
+		self.strActionInfo.setLabel('Keeping data scanned from the following paths')
+		self.mylist = xbmcgui.ControlList(100, 150, 500, 400)
+		self.addControl(self.mylist)
+		for i in range(len(self.display_list)):
+			self.mylist.addItem(self.display_list[i])
+		self.setFocus(self.mylist)	
+	#		List paths in excludes.xml (if it exists)
+		self.strActionInfo = xbmcgui.ControlLabel(800,120,200,200,'', 'font13', '0xFFFF00FF')
+		self.addControl(self.strActionInfo)
+		self.strActionInfo.setLabel('Contents of excludes.xml')
+		self.excludes_list = excludes_list
+		self.my_excludes = xbmcgui.ControlList(800,150,500,400)
+		self.addControl(self.my_excludes)
+		for i in range(len(self.excludes_list)):
+			self.my_excludes.addItem(self.excludes_list[i])
+		self.setFocus(self.my_excludes)
+	#		List the relevant addon settings
+		self.strActionInfo = xbmcgui.ControlLabel(800,375,200,200,'', 'font13', '0xFFFF00FF')
+		self.addControl(self.strActionInfo)
+		self.strActionInfo.setLabel('Addon Settings')
+		if is_pvr:
+			self.strActionInfo = xbmcgui.ControlLabel (840 ,400 + self.offset,300,100,'','font13','0xFFFFFFFF')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('Keep any PVR information')
+			self.offset += 25
+		if bookmarks:
+			self.strActionInfo = xbmcgui.ControlLabel (840,400 + self.offset,300,100,'','font13','0xFFFFFFFF')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('Keep any bookmark information')
+			self.offset += 25
+		if autoclean:
+			self.strActionInfo = xbmcgui.ControlLabel (840 ,400 + self.offset,300,100,'','font13','0xFFFFFFFF')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('Auto calling Clean Library')
+			self.offset += 25
+		if promptdelete:
+			self.strActionInfo = xbmcgui.ControlLabel (840,400 + self.offset,300,100,'','font13','0xFFFFFFFF')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('Prompting before deleting anything')
+			self.offset += 25
+		if no_sources:
+			self.strActionInfo = xbmcgui.ControlLabel (840,400 + self.offset,300,100,'','font13','0xFFFFFFFF')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('Not using any info from sources.xml')
+			self.offset += 25
+
+		self.button0 = xbmcgui.ControlButton(360, 650, 80, 30, "ABORT")
+		self.addControl(self.button0)
+		self.button1 = xbmcgui.ControlButton(750, 650, 80, 30, "CLEAN")
+		self.addControl(self.button1)
+		self.setFocus(self.button0)
+		button_abort = self.button0.getId()
+		dbglog('Button abort has id %d' % button_abort)
+		button_clean = self.button1.getId()
+		dbglog('button clean has id %d' % button_clean)
+		self.button0.controlRight(self.button1)
+		self.button1.controlLeft(self.button0)
+		self.button0.controlDown(self.button1)
+		self.button1.controlUp(self.button0)
+	
+ 
+	def onAction(self, action):
+		global flag
+		dbglog('Got an action %s' % action.getId())
+		if (action == ACTION_PREVIOUS_MENU) or (action == ACTION_NAV_BACK):
+			self.close()
+		if action == ACTION_SELECT_ITEM:
+			
+			btn = self.getFocus()
+			
+			if btn == self.button0:
+				dbglog('you pressed abort')
+				flag = 0
+			elif btn == self.button1:
+				dbglog('you pressed clean')
+				flag = 1
+			self.close()
+
 #  Set some variables ###
 
 addon = xbmcaddon.Addon()
@@ -55,7 +151,8 @@ if forcedbname == 'true':
 else:
 	forcedbname = False
 forcedname = addon.getSetting('forceddbname')
-
+display_list = []
+excludes_list = []
 excluding = False
 found = False
 is_mysql = False
@@ -291,6 +388,7 @@ if addon:
 	cursor = db.cursor()
 	
 	if xbmcvfs.exists(excludes_file):
+		excludes_list =[]
 		excluding = True
 		exclude_command = ''
 		try:
@@ -298,6 +396,7 @@ if addon:
 			er = tree.getroot()
 			for excludes in er.findall('exclude'):
 				to_exclude = excludes.text
+				excludes_list.append(to_exclude)
 				dbglog('Excluding plugin path - %s' % to_exclude)
 				exclude_command = exclude_command + " AND strPath NOT LIKE '" + to_exclude + "%'"
 			log('Parsed excludes.xml')
@@ -308,6 +407,7 @@ if addon:
 	
 	if not no_sources:
 		try:
+			display_list =[]
 			for video in root.findall('video'):
 				dbglog('Contents of sources.xml file')
 	
@@ -316,6 +416,7 @@ if addon:
 						the_path_name = path_name.text
 						for paths in sources.findall('path'):
 							the_path = paths.text
+							display_list.append(the_path)
 							dbglog('%s - %s' % (the_path_name, the_path))
 							if first_time:
 								first_time = False
@@ -370,9 +471,22 @@ if addon:
 	line1 = 'Please review the following and confirm if correct'
 	line2 = our_source_list
 	line3 = 'Are you sure ?'
+	
+#	mydisplay = MyClass()
+#	mydisplay.doModal()
+#	del mydisplay
+#	dialog = xbmcgui.Dialog()
+#	dialog.ok(addonname, 'flag is %d ' % flag)
 	if promptdelete:
-		dialog = xbmcgui.Dialog()
-		i = dialog.yesno(addonname, line1, line2, line3)
+		mydisplay = MyClass()
+		mydisplay.doModal()
+		del mydisplay
+		if flag == 1:
+			i = True
+		else:
+			i = False
+#		dialog = xbmcgui.Dialog()
+#		i = dialog.yesno(addonname, line1, line2, line3)
 	else:
 		i = True
 	if i:
