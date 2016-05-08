@@ -91,9 +91,9 @@ class MyClass(xbmcgui.Window):
 			self.strActionInfo.setLabel('Not using any info from sources.xml')
 			self.offset += 25
 
-		self.button0 = xbmcgui.ControlButton(360, 650, 80, 30, "ABORT")
+		self.button0 = xbmcgui.ControlButton(360, 650, 80, 30, "ABORT", alignment=2)
 		self.addControl(self.button0)
-		self.button1 = xbmcgui.ControlButton(750, 650, 80, 30, "CLEAN")
+		self.button1 = xbmcgui.ControlButton(750, 650, 80, 30, "CLEAN", alignment=2)
 		self.addControl(self.button1)
 		self.setFocus(self.button0)
 		button_abort = self.button0.getId()
