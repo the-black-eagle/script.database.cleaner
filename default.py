@@ -34,16 +34,18 @@ flag = 0
 
 class MyClass(xbmcgui.Window):
 	def __init__( self ):
+		self.setCoordinateResolution(0)
 		self.scaleX = self.getWidth()
 		self.centre = int(self.scaleX / 2)
+				
 		log('Centre is %d ' %self.centre)
-		self.strActionInfo = xbmcgui.ControlLabel( ( 720 - 184 ), 10, 400, 200, '', 'font13', '0xFFFF00FF')
+		self.strActionInfo = xbmcgui.ControlLabel( 868, 10, 400, 200, '', 'font13', '0xFFFF00FF')
 		self.addControl(self.strActionInfo)
 		self.strActionInfo.setLabel('DATABASE CLEANER - INFO')
 		self.offset = 10
 	#		List paths from sources.xml 
 		self.display_list = display_list
-		self.strActionInfo = xbmcgui.ControlLabel(100, 120, 400, 200, '', 'font13', '0xFFFF00FF')
+		self.strActionInfo = xbmcgui.ControlLabel(100, 120, 600, 200, '', 'font13', '0xFFFF00FF')
 		self.addControl(self.strActionInfo)
 		self.strActionInfo.setLabel('Keeping data scanned from the following paths')
 		self.mylist = xbmcgui.ControlList(100, 150, 500, 400)
@@ -52,48 +54,67 @@ class MyClass(xbmcgui.Window):
 			self.mylist.addItem(self.display_list[i])
 		self.setFocus(self.mylist)	
 	#		List paths in excludes.xml (if it exists)
-		self.strActionInfo = xbmcgui.ControlLabel(800,120,200,200,'', 'font13', '0xFFFF00FF')
+		self.strActionInfo = xbmcgui.ControlLabel(1060,120,400,200,'', 'font13', '0xFFFF00FF')
 		self.addControl(self.strActionInfo)
 		self.strActionInfo.setLabel('Contents of excludes.xml')
 		self.excludes_list = excludes_list
-		self.my_excludes = xbmcgui.ControlList(800,150,500,400)
+		self.my_excludes = xbmcgui.ControlList(1060,150,500,400)
 		self.addControl(self.my_excludes)
 		for i in range(len(self.excludes_list)):
 			self.my_excludes.addItem(self.excludes_list[i])
 		self.setFocus(self.my_excludes)
 	#		List the relevant addon settings
-		self.strActionInfo = xbmcgui.ControlLabel(800,375,200,200,'', 'font13', '0xFFFF00FF')
+		self.strActionInfo = xbmcgui.ControlLabel(1060,375,200,200,'', 'font13', '0xFFFF00FF')
 		self.addControl(self.strActionInfo)
 		self.strActionInfo.setLabel('Addon Settings')
 		if is_pvr:
-			self.strActionInfo = xbmcgui.ControlLabel (840 ,400 + self.offset,300,100,'','font13','0xFFFFFFFF')
+			self.strActionInfo = xbmcgui.ControlLabel (1100 ,400 + self.offset,450,100,'','font13','0xFFFFFFFF')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('Keep any PVR information')
-			self.offset += 25
+			self.offset += 28
 		if bookmarks:
-			self.strActionInfo = xbmcgui.ControlLabel (840,400 + self.offset,300,100,'','font13','0xFFFFFFFF')
+			self.strActionInfo = xbmcgui.ControlLabel (1100,400 + self.offset,450,100,'','font13','0xFFFFFFFF')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('Keep any bookmark information')
-			self.offset += 25
+			self.offset += 28
 		if autoclean:
-			self.strActionInfo = xbmcgui.ControlLabel (840 ,400 + self.offset,300,100,'','font13','0xFFFFFFFF')
+			self.strActionInfo = xbmcgui.ControlLabel (1100 ,400 + self.offset,450,100,'','font13','0xFFFFFFFF')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('Auto calling Clean Library')
-			self.offset += 25
+			self.offset += 28
 		if promptdelete:
-			self.strActionInfo = xbmcgui.ControlLabel (840,400 + self.offset,300,100,'','font13','0xFFFFFFFF')
+			self.strActionInfo = xbmcgui.ControlLabel (1100,400 + self.offset,650,100,'','font13','0xFFFFFFFF')
 			self.addControl(self.strActionInfo)
-			self.strActionInfo.setLabel('Prompting before deleting anything')
-			self.offset += 25
+			self.strActionInfo.setLabel('Prompting before deleting anything (This window !!)')
+			self.offset += 28
+		if autobackup == 'true' and not is_mysql:
+			self.strActionInfo = xbmcgui.ControlLabel (1100,400 + self.offset,450,100,'','font13','0xFFFFFFFF')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('Auto backing up local database')
+			self.offset += 28
 		if no_sources:
-			self.strActionInfo = xbmcgui.ControlLabel (840,400 + self.offset,300,100,'','font13','0xFFFFFFFF')
+			self.strActionInfo = xbmcgui.ControlLabel (1100,400 + self.offset,450,100,'','font13','0xFFFFFFFF')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('Not using any info from sources.xml')
-			self.offset += 25
+			self.offset += 28
+		if debugging:
+			debug_string = 'Debugging is enabled'
+		else:
+			debug_string = 'Debugging is disabled'
+		self.strActionInfo = xbmcgui.ControlLabel (1100,400 + self.offset,450,100,'','font13','0xFFFFFFFF')
+		self.addControl(self.strActionInfo)
+		self.strActionInfo.setLabel(debug_string)	
+		if is_mysql:
+			self.strActionInfo = xbmcgui.ControlLabel (100, 800, 150, 30, '', 'font13', '0xFFFF0000')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('WARNING')
+			self.strActionInfo = xbmcgui.ControlLabel (192, 800, 800, 30, '', 'font13', '0xFFFFFFFF')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('- MySQL database not backed up automatically, please do this manually')
 
-		self.button0 = xbmcgui.ControlButton(360, 650, 80, 30, "ABORT", alignment=2)
+		self.button0 = xbmcgui.ControlButton(500, 950, 80, 30, "ABORT", alignment=2)
 		self.addControl(self.button0)
-		self.button1 = xbmcgui.ControlButton(750, 650, 80, 30, "CLEAN", alignment=2)
+		self.button1 = xbmcgui.ControlButton(1300, 950, 80, 30, "CLEAN", alignment=2)
 		self.addControl(self.button1)
 		self.setFocus(self.button0)
 		button_abort = self.button0.getId()
