@@ -30,6 +30,7 @@ import xbmcvfs
 ACTION_PREVIOUS_MENU = 10
 ACTION_SELECT_ITEM = 7
 ACTION_NAV_BACK = 92
+ACTION_MOUSE_LEFT_CLICK = 100
 flag = 0
 
 class MyClass(xbmcgui.Window):
@@ -105,11 +106,11 @@ class MyClass(xbmcgui.Window):
 		self.addControl(self.strActionInfo)
 		self.strActionInfo.setLabel(debug_string)
 		self.offset += 45
-		
+		#	Display the name of the database we are connected to
 		self.strActionInfo = xbmcgui.ControlLabel ( 1060, 400 + self.offset, 350, 100, '', 'font13', '0xFFFF00FF')
 		self.addControl(self.strActionInfo)
 		self.strActionInfo.setLabel('Connected to database - %s' % our_dbname)
-			
+		#	Show warning about backup if using MySQL	
 		if is_mysql:
 			self.strActionInfo = xbmcgui.ControlLabel (100, 800, 150, 30, '', 'font13', '0xFFFF0000')
 			self.addControl(self.strActionInfo)
@@ -117,7 +118,7 @@ class MyClass(xbmcgui.Window):
 			self.strActionInfo = xbmcgui.ControlLabel (192, 800, 800, 30, '', 'font13', '0xFFFFFFFF')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('- MySQL database not backed up automatically, please do this manually')
-
+		#	Create the buttons
 		self.button0 = xbmcgui.ControlButton(500, 950, 80, 30, "ABORT", alignment=2)
 		self.addControl(self.button0)
 		self.button1 = xbmcgui.ControlButton(1300, 950, 80, 30, "CLEAN", alignment=2)
@@ -127,6 +128,7 @@ class MyClass(xbmcgui.Window):
 		dbglog('Button abort has id %d' % button_abort)
 		button_clean = self.button1.getId()
 		dbglog('button clean has id %d' % button_clean)
+		#	Make up/down/left/right switch between buttons
 		self.button0.controlRight(self.button1)
 		self.button1.controlLeft(self.button0)
 		self.button0.controlDown(self.button1)
@@ -136,12 +138,13 @@ class MyClass(xbmcgui.Window):
 	def onAction(self, action):
 		global flag
 		dbglog('Got an action %s' % action.getId())
-		if (action == ACTION_PREVIOUS_MENU) or (action == ACTION_NAV_BACK):
+		if ( action == ACTION_PREVIOUS_MENU ) or ( action == ACTION_NAV_BACK ):
 			self.close()
-		if action == ACTION_SELECT_ITEM:
-			
-			btn = self.getFocus()
-			
+		if (action == ACTION_SELECT_ITEM) or ( action == ACTION_MOUSE_LEFT_CLICK ):
+			try:
+				btn = self.getFocus()
+			except:
+				btn = None
 			if btn == self.button0:
 				dbglog('you pressed abort')
 				flag = 0
