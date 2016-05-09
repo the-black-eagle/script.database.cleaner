@@ -103,7 +103,13 @@ class MyClass(xbmcgui.Window):
 			debug_string = 'Debugging is disabled'
 		self.strActionInfo = xbmcgui.ControlLabel (1100,400 + self.offset,450,100,'','font13','0xFFFFFFFF')
 		self.addControl(self.strActionInfo)
-		self.strActionInfo.setLabel(debug_string)	
+		self.strActionInfo.setLabel(debug_string)
+		self.offset += 45
+		
+		self.strActionInfo = xbmcgui.ControlLabel ( 1060, 400 + self.offset, 350, 100, '', 'font13', '0xFFFF00FF')
+		self.addControl(self.strActionInfo)
+		self.strActionInfo.setLabel('Connected to database - %s' % our_dbname)
+			
 		if is_mysql:
 			self.strActionInfo = xbmcgui.ControlLabel (100, 800, 150, 30, '', 'font13', '0xFFFF0000')
 			self.addControl(self.strActionInfo)
