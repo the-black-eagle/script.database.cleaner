@@ -295,31 +295,7 @@ if addon:
 		except:
 			is_mysql = False
 
-	if autobackup == 'true' and not is_mysql:
-		backup_path = xbmc.translatePath('special://database/backups/'
-				).decode('utf-8')
-
-		if not xbmcvfs.exists(backup_path):
-			dbglog('Creating backup path %s' % backup_path)
-			xbmcvfs.mkdir(backup_path)
-		now = datetime.datetime.now()
-		if forcedbname:
-			our_dbname = forcedname
-		current_db = db_path + our_dbname + '.db'
-		if backup_filename == '':
-			backup_filename = our_dbname
-		backup_db = backup_path + backup_filename + '_' \
-			+ now.strftime('%Y-%m-%d_%H%M') + '.db'
-		backup_filename = backup_filename + '_' \
-			+ now.strftime('%Y-%m-%d_%H%M')
-		success = xbmcvfs.copy(current_db, backup_db)
-		if success == 1:
-			success = 'successful'
-		else:
-			success = 'failed'
-		dbglog('auto backup database %s.db to %s.db - result was %s'
-			% (our_dbname, backup_filename, success))
-
+	
 	if source_file_path != '':
 		sources_file = source_file_path
 		remote_file = True
@@ -525,6 +501,30 @@ if addon:
 	else:
 		i = True
 	if i:
+		if autobackup == 'true' and not is_mysql:
+		backup_path = xbmc.translatePath('special://database/backups/'
+				).decode('utf-8')
+
+		if not xbmcvfs.exists(backup_path):
+			dbglog('Creating backup path %s' % backup_path)
+			xbmcvfs.mkdir(backup_path)
+		now = datetime.datetime.now()
+		if forcedbname:
+			our_dbname = forcedname
+		current_db = db_path + our_dbname + '.db'
+		if backup_filename == '':
+			backup_filename = our_dbname
+		backup_db = backup_path + backup_filename + '_' \
+			+ now.strftime('%Y-%m-%d_%H%M') + '.db'
+		backup_filename = backup_filename + '_' \
+			+ now.strftime('%Y-%m-%d_%H%M')
+		success = xbmcvfs.copy(current_db, backup_db)
+		if success == 1:
+			success = 'successful'
+		else:
+			success = 'failed'
+		dbglog('auto backup database %s.db to %s.db - result was %s'
+			% (our_dbname, backup_filename, success))
 		try:
 
 		# Execute the SQL command
