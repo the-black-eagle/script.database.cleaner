@@ -6,7 +6,7 @@
 #
 # Version 27b/7 - Batter Pudding Fix added
 # Version 27b/9 - Batter Pudding tweaks the debug logging
-#
+# Version 28b/1	- New GUI, several code fixes
 #
 
 import datetime
