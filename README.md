@@ -15,16 +15,20 @@ their database.
 Users can also choose (via the add-on settings) to retain or remove old 
 PVR information and to retain or remove bookmarks.
 
-When run, the script will prompt with a pop-up box containing a (long) line
-of SQL.  This is the actual SQL command that will be executed and users are
-encouraged to check that all their defined sources are indeed listed. 
-Clicking on 'yes' will execute the SQL, clicking on 'no' will abort the script
+When run, the script will prompt with a pop-up dialog box containing a list
+of the paths to retain in the database. Users are encouraged to check that 
+all their defined sources are indeed listed. The current settings for the add-on
+are also displayed, along with the contents of any 'excludes.xml' file.
+The name of the currently connected database is also displayed.
+If you are using MySQL, there will also be a warning to back up your database
+manually.  You have the option to either abort the script, or to clean the database. 
+Clicking on 'CLEAN' will run the cleaner, clicking on 'ABORT' will exit the script
 with no changes made to the database.
 
 Once users are happy that the script is working correctly, this prompt can
-be turned off in the add-on settings.
+be turned off in the add-on settings enabling the script to run silently.
 
-When the SQL command has been run the script calls Kodi's built in 'clean
+When the script cleaning has finished, the script calls Kodi's built in 'clean
 library' routine to clean the other tables in the database.  This can also
 be turned off in the settings but this is not recommended.
 
