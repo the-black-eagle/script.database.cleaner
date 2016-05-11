@@ -1,4 +1,10 @@
-Version 0.5.2  4/5/16
+Version 0.5.3   11/05/16
+
+[Change] Don't back-up local database unless actually cleaning
+[Add]    New dialog window detailing EXCLUDED paths, settings etc
+[Fix]    Handle mouse clicks in dialog window
+
+Version 0.5.2   4/5/16
 
 [Fix] Turning off 'prompt before delete' in settings caused an error
 [Fix] Incorrect variable name in debugging routine
