@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="script.database.cleaner"
       name="Video Database Cleaner"
-      version="0.5.2"
+      version="0.5.3"
       provider-name="black_eagle, BatterPudding.">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
@@ -12,6 +12,6 @@
   <extension point="xbmc.addon.metadata">
     <platform>all</platform>
     <summary lang="en">A Script to clean Kodi's video database</summary>
-    <description lang="en">A Script to clean streams, old missing files and general junk from your video database. Works with both MySQL and SQLite libraries.</description>
+    <description lang="en">This program add-on will clean streams, old missing files and general junk from your video database. Works with both MySQL and SQLite libraries.</description>
   </extension>
 </addon>
