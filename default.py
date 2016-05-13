@@ -58,15 +58,19 @@ class MyClass(xbmcgui.WindowXMLDialog):
 			self.mylist.addItem(self.display_list[i])
 		self.setFocus(self.mylist)
 	#		List paths in excludes.xml (if it exists)
+		
 		self.strActionInfo = xbmcgui.ControlLabel(1060,120,400,200,'', 'font18', '0xFFFF00FF')
 		self.addControl(self.strActionInfo)
 		self.strActionInfo.setLabel('Contents of excludes.xml')
 		self.excludes_list = excludes_list
 		self.my_excludes = xbmcgui.ControlList(1060,150,500,400)
 		self.addControl(self.my_excludes)
-		for i in range(len(self.excludes_list)):
-			self.my_excludes.addItem(self.excludes_list[i])
-		self.setFocus(self.my_excludes)
+		if excluding:
+			for i in range(len(self.excludes_list)):
+				self.my_excludes.addItem(self.excludes_list[i])
+		else:
+			self.my_excludes.addItem("Not Present")
+		self.setFocus(self.my_excludes)	
 	#		List the relevant addon settings
 		self.strActionInfo = xbmcgui.ControlLabel(1060,375,200,200,'', 'font18', '0xFFFF00FF')
 		self.addControl(self.strActionInfo)
@@ -502,29 +506,29 @@ if addon:
 		i = True
 	if i:
 		if autobackup == 'true' and not is_mysql:
-		backup_path = xbmc.translatePath('special://database/backups/'
+			backup_path = xbmc.translatePath('special://database/backups/'
 				).decode('utf-8')
 
-		if not xbmcvfs.exists(backup_path):
-			dbglog('Creating backup path %s' % backup_path)
-			xbmcvfs.mkdir(backup_path)
-		now = datetime.datetime.now()
-		if forcedbname:
-			our_dbname = forcedname
-		current_db = db_path + our_dbname + '.db'
-		if backup_filename == '':
-			backup_filename = our_dbname
-		backup_db = backup_path + backup_filename + '_' \
-			+ now.strftime('%Y-%m-%d_%H%M') + '.db'
-		backup_filename = backup_filename + '_' \
-			+ now.strftime('%Y-%m-%d_%H%M')
-		success = xbmcvfs.copy(current_db, backup_db)
-		if success == 1:
-			success = 'successful'
-		else:
-			success = 'failed'
-		dbglog('auto backup database %s.db to %s.db - result was %s'
-			% (our_dbname, backup_filename, success))
+			if not xbmcvfs.exists(backup_path):
+				dbglog('Creating backup path %s' % backup_path)
+				xbmcvfs.mkdir(backup_path)
+			now = datetime.datetime.now()
+			if forcedbname:
+				our_dbname = forcedname
+			current_db = db_path + our_dbname + '.db'
+			if backup_filename == '':
+				backup_filename = our_dbname
+			backup_db = backup_path + backup_filename + '_' \
+				+ now.strftime('%Y-%m-%d_%H%M') + '.db'
+			backup_filename = backup_filename + '_' \
+				+ now.strftime('%Y-%m-%d_%H%M')
+			success = xbmcvfs.copy(current_db, backup_db)
+			if success == 1:
+				success = 'successful'
+			else:
+				success = 'failed'
+			dbglog('auto backup database %s.db to %s.db - result was %s'
+				% (our_dbname, backup_filename, success))
 		try:
 
 		# Execute the SQL command
