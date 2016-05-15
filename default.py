@@ -9,6 +9,7 @@
 # Version 28b/1	- New GUI, several code fixes
 #
 
+
 import datetime
 
 import json as jsoninterface
@@ -46,14 +47,15 @@ class MyClass(xbmcgui.WindowXMLDialog):
 		self.strActionInfo = xbmcgui.ControlLabel( 868, 10, 400, 200, '', 'font13', '0xFFFF00FF')
 		self.addControl(self.strActionInfo)
 #		self.strActionInfo.setLabel('[B]DATABASE CLEANER - INFO[/B]')
-		self.offset = 10
+		self.offset = 28
 	#		List paths from sources.xml 
 		self.display_list = display_list
-		self.strActionInfo = xbmcgui.ControlLabel(200, 120, 600, 200, '', 'font18', '0xFFFF00FF')
+		self.strActionInfo = xbmcgui.ControlLabel(200, 120, 700, 200, '', 'font18', '0xFFFF00FF')
 		self.addControl(self.strActionInfo)
 		self.strActionInfo.setLabel('Keeping data scanned from the following paths')
 		self.mylist = xbmcgui.ControlList(200, 150, 600, 400)
 		self.addControl(self.mylist)
+		self.mylist.addItem('')
 		for i in range(len(self.display_list)):
 			self.mylist.addItem(self.display_list[i])
 		self.setFocus(self.mylist)
@@ -65,6 +67,7 @@ class MyClass(xbmcgui.WindowXMLDialog):
 		self.excludes_list = excludes_list
 		self.my_excludes = xbmcgui.ControlList(1060,150,500,400)
 		self.addControl(self.my_excludes)
+		self.my_excludes.addItem('')
 		if excluding:
 			for i in range(len(self.excludes_list)):
 				self.my_excludes.addItem(self.excludes_list[i])
@@ -72,7 +75,7 @@ class MyClass(xbmcgui.WindowXMLDialog):
 			self.my_excludes.addItem("Not Present")
 		self.setFocus(self.my_excludes)	
 	#		List the relevant addon settings
-		self.strActionInfo = xbmcgui.ControlLabel(1060,375,200,200,'', 'font18', '0xFFFF00FF')
+		self.strActionInfo = xbmcgui.ControlLabel(1060,375,400,200,'', 'font18', '0xFFFF00FF')
 		self.addControl(self.strActionInfo)
 		self.strActionInfo.setLabel('Addon Settings')
 		if is_pvr:
@@ -126,9 +129,9 @@ class MyClass(xbmcgui.WindowXMLDialog):
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('- MySQL database [B]not[/B] backed up automatically, please do this [B]manually[/B]')
 		#	Create the buttons
-		self.button0 = xbmcgui.ControlButton(500, 950, 80, 30, "[COLOR red]ABORT[/COLOR]", alignment=2)
+		self.button0 = xbmcgui.ControlButton(500, 950, 180, 30, "[COLOR red]ABORT[/COLOR]", alignment=2)
 		self.addControl(self.button0)
-		self.button1 = xbmcgui.ControlButton(1300, 950, 80, 30, "[COLOR green]CLEAN[/COLOR]", alignment=2)
+		self.button1 = xbmcgui.ControlButton(1300, 950, 180, 30, "[COLOR green]CLEAN[/COLOR]", alignment=2)
 		self.addControl(self.button1)
 		self.setFocus(self.button0)
 		button_abort = self.button0.getId()
