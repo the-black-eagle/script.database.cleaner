@@ -199,6 +199,7 @@ excluding = False
 found = False
 is_mysql = False
 remote_file = False
+cleaning = False
 path_name = ''
 the_path = ''
 success = 0
@@ -218,7 +219,31 @@ def log(txt):
 def dbglog(txt):
 	if debugging:
 		log(txt)
-
+		
+def cleaner_log_file(our_select, cleaning):
+	cleaner_log = xbmc.translatePath('special://home').decode('utf-8') + 'temp/'
+	if xbmcvfs.exists(cleaner_log + 'database-cleaner.log'):
+		dbglog('database-cleaner.log exists - renaming to old.log')
+		xbmcvfs.delete(cleaner_log +'database-cleaner.old.log')
+		xbmcvfs.copy(cleaner_log + 'database-cleaner.log' , cleaner_log + 'database-cleaner.old.log')
+		xbmcvfs.delete(cleaner_log + 'database-cleaner.log')
+	logfile = xbmcvfs.File(cleaner_log + 'database-cleaner.log', 'w')
+	cursor.execute(our_select)
+	if not cleaning:
+		logfile.write('The following file paths would be removed from your database')
+		logfile.write('\n\n')
+	else:
+		logfile.write('The following paths were removed from the database')
+		logfile.write('\n\n')
+	for strPath in cursor:
+		mystring = u'Removing unused path '.join(strPath) + '\n'
+		outdata = mystring.encode('utf-8')
+		dbglog('Removing unused path %s' % strPath)
+		logfile.write(outdata)
+	logfile.close()
+	
+		
+		
 dbglog('script version %s started' % addonversion)
 
 our_dbname = 'MyVideos'
@@ -490,6 +515,11 @@ if addon:
 	line2 = our_source_list
 	line3 = 'Are you sure ?'
 	
+	our_select = sql.replace('DELETE FROM files','SELECT strPath FROM path',1)
+	dbglog('Select Command is %s' % our_select)
+	
+	cleaner_log_file(our_select, False)
+		
 #	mydisplay = MyClass()
 #	mydisplay.doModal()
 #	del mydisplay
@@ -532,6 +562,7 @@ if addon:
 				success = 'failed'
 			dbglog('auto backup database %s.db to %s.db - result was %s'
 				% (our_dbname, backup_filename, success))
+		cleaner_log_file(our_select, True)
 		try:
 
 		# Execute the SQL command
