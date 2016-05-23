@@ -15,7 +15,7 @@ their database.
 Users can also choose (via the add-on settings) to retain or remove old 
 PVR information and to retain or remove bookmarks.
 
-When run, the script will prompt with a pop-up dialog box containing a list
+When run, the script will prompt with a dialog window containing a list
 of the paths to retain in the database. Users are encouraged to check that 
 all their defined sources are indeed listed. The current settings for the add-on
 are also displayed, along with the contents of any 'excludes.xml' file.
@@ -27,6 +27,13 @@ with no changes made to the database.
 
 Once users are happy that the script is working correctly, this prompt can
 be turned off in the add-on settings enabling the script to run silently.
+
+The script now creates a logfile containing details of the paths removed.  This can be
+found in Kodi's 'temp' directory.  The log is called 'database-cleaner.log'.  If the
+log already exists, it will be renamed to 'database-cleaner.old.log'.  The script will
+write to the log even if you 'abort' the clean.  This allows users to do a 'dry run' to
+see exactly what paths are going to be removed from their database before actually
+doing so.
 
 When the script cleaning has finished, the script calls Kodi's built in 'clean
 library' routine to clean the other tables in the database.  This can also
