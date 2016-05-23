@@ -1,8 +1,9 @@
-Version 0.5.3   11/05/16
+Version 0.5.3   23/05/16
 
 [Change] Don't back-up local database unless actually cleaning
 [Add]    New dialog window detailing EXCLUDED paths, settings etc
 [Fix]    Handle mouse clicks in dialog window
+[Add]	 Logging of removed paths to 'database-cleaner.log' in Kodi's 'temp' directory
 
 Version 0.5.2   4/5/16
 
