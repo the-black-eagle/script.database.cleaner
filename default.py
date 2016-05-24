@@ -222,10 +222,12 @@ def dbglog(txt):
 		
 def cleaner_log_file(our_select, cleaning):
 	cleaner_log = xbmc.translatePath('special://home').decode('utf-8') + 'temp/'
-	if xbmcvfs.exists(cleaner_log + 'database-cleaner.log'):
+	if xbmcvfs.exists(cleaner_log + 'database-cleaner.log') and cleaning:
 		dbglog('database-cleaner.log exists - renaming to old.log')
 		xbmcvfs.delete(cleaner_log +'database-cleaner.old.log')
 		xbmcvfs.copy(cleaner_log + 'database-cleaner.log' , cleaner_log + 'database-cleaner.old.log')
+		xbmcvfs.delete(cleaner_log + 'database-cleaner.log')
+	elif xbmcvfs.exists(cleaner_log + 'database-cleaner.log') and not cleaning:
 		xbmcvfs.delete(cleaner_log + 'database-cleaner.log')
 	logfile = xbmcvfs.File(cleaner_log + 'database-cleaner.log', 'w')
 	cursor.execute(our_select)
