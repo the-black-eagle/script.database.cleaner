@@ -83,3 +83,11 @@ msgstr ""
 msgctxt "#32019"
 msgid " - Forced database name"
 msgstr ""
+
+msgctxt "#32020"
+msgid "Remove specific path from database"
+msgstr ""
+
+msgctxt "#32021"
+msgid " - Path"
+msgstr ""
