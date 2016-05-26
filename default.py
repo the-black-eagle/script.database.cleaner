@@ -108,6 +108,11 @@ class MyClass(xbmcgui.WindowXMLDialog):
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('Not using info from sources.xml')
 			self.offset += 28
+		if specificpath:
+			self.strActionInfo = xbmcgui.ControlLabel (1100,400 + self.offset,550,100,'','font13','0xFFFFFFFF')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('Cleaning a specific path')
+			self.offset += 28
 		if debugging:
 			debug_string = 'Debugging enabled'
 		else:
@@ -128,6 +133,13 @@ class MyClass(xbmcgui.WindowXMLDialog):
 			self.strActionInfo = xbmcgui.ControlLabel (292, 800, 800, 30, '', 'font13', '0xFFFFFFFF')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('- MySQL database [B]not[/B] backed up automatically, please do this [B]manually[/B]')
+		if specificpath:
+			self.strActionInfo = xbmcgui.ControlLabel (200, 830, 150, 30, '', 'font18', '0xFFFF0000')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('WARNING')
+			self.strActionInfo = xbmcgui.ControlLabel(292, 830, 800, 30, '', 'font13', '0xFFFFFFFF')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('- Removing specific path %s ' % specific_path_to_remove)
 		#	Create the buttons
 		self.button0 = xbmcgui.ControlButton(500, 950, 180, 30, "[COLOR red]ABORT[/COLOR]", alignment=2)
 		self.addControl(self.button0)
@@ -185,7 +197,7 @@ source_file_path = addon.getSetting('sourcefilepath')
 debugging = addon.getSetting('debugging')
 no_sources = addon.getSetting('usesources')
 autobackup = addon.getSetting('autobackup')
-
+specificpath = addon.getSetting('specificpath')
 backup_filename = addon.getSetting('backupname')
 forcedbname = addon.getSetting('overridedb')
 if forcedbname == 'true':
@@ -193,6 +205,11 @@ if forcedbname == 'true':
 else:
 	forcedbname = False
 forcedname = addon.getSetting('forceddbname')
+if specificpath == 'true':
+	specificpath = True
+else:
+	specificpath = False
+specific_path_to_remove = addon.getSetting('spcpathstr')
 display_list = []
 excludes_list = []
 excluding = False
@@ -237,11 +254,21 @@ def cleaner_log_file(our_select, cleaning):
 	else:
 		logfile.write('The following paths were removed from the database')
 		logfile.write('\n\n')
-	for strPath in cursor:
-		mystring = u'Removing unused path '.join(strPath) + '\n'
+	if not specificpath:
+		for strPath in cursor:
+			mystring = u'Removing unused path '.join(strPath) + '\n'
+			outdata = mystring.encode('utf-8')
+			dbglog('Removing unused path %s' % strPath)
+			logfile.write(outdata)
+	else:
+		mystring = u'Removing specific path ' + specific_path_to_remove + '\n'
 		outdata = mystring.encode('utf-8')
-		dbglog('Removing unused path %s' % strPath)
-		logfile.write(outdata)
+		dbglog('Removing specific path %s' % specific_path_to_remove)
+		for strPath in cursor:
+			mystring = u'Removing unwanted path '.join(strPath) + '\n'
+			outdata = mystring.encode('utf-8')
+			dbglog('Removing unwanted path %s' % strPath)
+			logfile.write(outdata)
 	logfile.close()
 	
 		
@@ -505,20 +532,28 @@ if addon:
 		if excluding:
 			my_command = my_command + exclude_command
 			our_source_list = our_source_list + 'Keeping items from excludes.xml '
-					
+	if not specificpath:			
 # Build SQL query	
 		if my_command:
 			sql = """DELETE FROM files WHERE idPath IN ( SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath LIKE 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%') AND (""" + my_command + """)));"""
 		else:
 			sql = """DELETE FROM files WHERE idPath IN (SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath LIKE 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%')));"""
 			
-	dbglog('SQL command is %s' % sql)
-	line1 = 'Please review the following and confirm if correct'
-	line2 = our_source_list
-	line3 = 'Are you sure ?'
+		dbglog('SQL command is %s' % sql)
+		line1 = 'Please review the following and confirm if correct'
+		line2 = our_source_list
+		line3 = 'Are you sure ?'
+		
+		our_select = sql.replace('DELETE FROM files','SELECT strPath FROM path',1)
+		dbglog('Select Command is %s' % our_select)
+	else:		# cleaning a specific path
+		if specific_path_to_remove != '':
+			sql = """delete from path where idPath in(select * from (SELECT idPath FROM path WHERE (strPath LIKE '""" + specific_path_to_remove +"""%')) as temptable)"""
+			our_select = "SELECT strPath FROM path WHERE idPath IN (SELECT idPath FROM path WHERE (strPath LIKE'" + specific_path_to_remove + "%'))"
+			dbglog('Select Command is %s' % our_select)
+		else:
+			dbglog("Error - Specific path selected with no path defined")
 	
-	our_select = sql.replace('DELETE FROM files','SELECT strPath FROM path',1)
-	dbglog('Select Command is %s' % our_select)
 	
 	cleaner_log_file(our_select, False)
 		
