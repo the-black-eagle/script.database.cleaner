@@ -6,7 +6,8 @@
 #
 # Version 27b/7 - Batter Pudding Fix added
 # Version 27b/9 - Batter Pudding tweaks the debug logging
-# Version 28b/1	- New GUI, several code fixes
+# Version 28b/1 - New GUI, several code fixes
+# Version 28b/2 - Fix the WINDOWS KODI temp path
 #
 
 
@@ -238,7 +239,7 @@ def dbglog(txt):
 		log(txt)
 		
 def cleaner_log_file(our_select, cleaning):
-	cleaner_log = xbmc.translatePath('special://home').decode('utf-8') + 'temp/'
+	cleaner_log = xbmc.translatePath('special://temp').decode('utf-8')
 	if xbmcvfs.exists(cleaner_log + 'database-cleaner.log') and cleaning:
 		dbglog('database-cleaner.log exists - renaming to old.log')
 		xbmcvfs.delete(cleaner_log +'database-cleaner.old.log')
