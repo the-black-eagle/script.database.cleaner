@@ -9,7 +9,7 @@ Version 0.5.3   23/05/16
 [Fix]    Handle mouse clicks in dialog window
 [Add]	 Logging of removed paths to 'database-cleaner.log' in Kodi's 'temp' directory
 
-Version 0.5.2   4/5/16
+Version 0.5.2   04/05/16
 
 [Fix] 	 Turning off 'prompt before delete' in settings caused an error
 [Fix] 	 Incorrect variable name in debugging routine
