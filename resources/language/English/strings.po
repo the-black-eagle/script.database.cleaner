@@ -91,3 +91,17 @@ msgstr ""
 msgctxt "#32021"
 msgid " - Path"
 msgstr ""
+
+msgctxt "#32022"
+msgid "Replace path in database"
+msgstr ""
+
+msgctxt "#32023"
+msgid " - Old path"
+msgstr ""
+
+msgctxt "#32024"
+msgid " - New path"
+msgstr ""
+
+

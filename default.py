@@ -201,6 +201,13 @@ autobackup = addon.getSetting('autobackup')
 specificpath = addon.getSetting('specificpath')
 backup_filename = addon.getSetting('backupname')
 forcedbname = addon.getSetting('overridedb')
+replacepath = addon.getSetting('replacepath')
+if replacepath == 'true':
+	replacepath = True
+else:
+	replacepath = False
+old_path = addon.getSetting('oldpath')
+new_path = addon.getSetting('newpath')
 if forcedbname == 'true':
 	forcedbname = True
 else:
@@ -213,6 +220,7 @@ else:
 specific_path_to_remove = addon.getSetting('spcpathstr')
 display_list = []
 excludes_list = []
+renamepath_list = []
 excluding = False
 found = False
 is_mysql = False
@@ -250,19 +258,25 @@ def cleaner_log_file(our_select, cleaning):
 		xbmcvfs.delete(cleaner_log)
 	logfile = xbmcvfs.File(cleaner_log, 'w')
 	cursor.execute(our_select)
-	if not cleaning:
+	if not cleaning and not replacepath:
 		logfile.write('The following file paths would be removed from your database')
 		logfile.write('\n\n')
-	else:
+	elif cleaning and not replacepath:
 		logfile.write('The following paths were removed from the database')
 		logfile.write('\n\n')
-	if not specificpath:
+	elif not cleaning and replacepath:
+		logfile.write('The following paths will be changed in your database')
+		logfile.write('\n\n')
+	else:
+		logfile.write('The following paths were changed in your database')
+		logfile.write('\n\n')
+	if not specificpath and not replacepath:
 		for strPath in cursor:
 			mystring = u'Removing unused path '.join(strPath) + '\n'
 			outdata = mystring.encode('utf-8')
 			dbglog('Removing unused path %s' % strPath)
 			logfile.write(outdata)
-	else:
+	elif specificpath and not replacepath:
 		mystring = u'Removing specific path ' + specific_path_to_remove + '\n'
 		outdata = mystring.encode('utf-8')
 		dbglog('Removing specific path %s' % specific_path_to_remove)
@@ -271,6 +285,15 @@ def cleaner_log_file(our_select, cleaning):
 			outdata = mystring.encode('utf-8')
 			dbglog('Removing unwanted path %s' % strPath)
 			logfile.write(outdata)
+	else:
+		mystring = u'Changing path '+ old_path + 'to ' + new_path + '\n'
+		outdata = mystring.encode('utf-8')
+		for strPath in cursor:
+			mystring = u' changing path '.join(strPath) + '\n'
+			outdata = mystring.encode('utf-8')
+			dbglog('Changing path %s' % strPath)
+			logfile.write(outdata)
+		our_data = cursor
 	logfile.close()
 	
 		
@@ -432,9 +455,10 @@ if addon:
 		try:
 			db = mysql.connector.connect(user=our_username, database=forcedname, password=our_password, host=our_host)
 			if db.is_connected():
-				log('Connected to forced MySQL database %s' % forcedname)
+				our_dbname = forcedname
+				dbglog('Connected to forced MySQL database %s' % forcedname)
 		except:
-			log('Error connecting to forced	database - %s' % forcedname)
+			dbglog('Error connecting to forced	database - %s' % forcedname)
 			exit(1)
 	elif not is_mysql and not forcedbname:
 		try:
@@ -448,18 +472,18 @@ if addon:
 	else:
 		testpath = db_path + forcedname + '.db'
 		if not xbmcvfs.exists(testpath):
-			log('Forced version of database does not exist')
+			dbglog('Forced version of database does not exist')
 			xbmcgui.Dialog().ok(addonname,'Forced version of database not found. Script will now exit')
 			exit(1)
 		try:
 			my_db_connector = db_path + forcedname + '.db'
 			db = sqlite3.connect(my_db_connector)
-			log('Connected to forced video database')
+			dbglog('Connected to forced video database')
 		except:
-			log('Unable to connect to forced database s%' % forcedname)
+			dbglog('Unable to connect to forced database s%' % forcedname)
 			exit(1)
 
-	cursor = db.cursor()
+	cursor = db.cursor(buffered=True)
 	
 	if xbmcvfs.exists(excludes_file):
 		excludes_list =[]
@@ -534,7 +558,7 @@ if addon:
 		if excluding:
 			my_command = my_command + exclude_command
 			our_source_list = our_source_list + 'Keeping items from excludes.xml '
-	if not specificpath:			
+	if not specificpath and not replacepath:			
 # Build SQL query	
 		if my_command:
 			sql = """DELETE FROM files WHERE idPath IN ( SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath LIKE 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%') AND (""" + my_command + """)));"""
@@ -545,7 +569,7 @@ if addon:
 				
 		our_select = sql.replace('DELETE FROM files','SELECT strPath FROM path',1)
 		dbglog('Select Command is %s' % our_select)
-	else:		# cleaning a specific path
+	elif not replacepath and specificpath:		# cleaning a specific path
 		if specific_path_to_remove != '':
 			sql = """delete from path where idPath in(select * from (SELECT idPath FROM path WHERE (strPath LIKE '""" + specific_path_to_remove +"""%')) as temptable)"""
 			our_select = "SELECT strPath FROM path WHERE idPath IN (SELECT idPath FROM path WHERE (strPath LIKE'" + specific_path_to_remove + "%'))"
@@ -553,7 +577,12 @@ if addon:
 		else:
 			dbglog("Error - Specific path selected with no path defined")
 			exit(1)
-	
+	else: # must be replacing a path at this point
+		if old_path != '' and new_path != '':
+			our_select = "SELECT strPath from path WHERE strPath Like '" + old_path + "%'"
+		else:
+			dbglog('Error - Missing path for replacement')
+			exit(1)
 	cleaner_log_file(our_select, False)
 		
 	if promptdelete:
@@ -593,24 +622,51 @@ if addon:
 			dbglog('auto backup database %s.db to %s.db - result was %s'
 				% (our_dbname, backup_filename, success))
 		cleaner_log_file(our_select, True)
-		try:
-
-		# Execute the SQL command
-
-			cursor.execute(sql)
-
-		# Commit your changes in the database
-
-			db.commit()
-		except:
-
-		# Rollback in case there is any error
-
-			db.rollback()
-			dbglog('Error in db commit. Transaction rolled back')
-
-	# disconnect from server
-
+		if not replacepath:
+			try:
+	
+			# Execute the SQL command
+	
+				cursor.execute(sql)
+	
+			# Commit your changes in the database
+	
+				db.commit()
+			except:
+	
+			# Rollback in case there is any error
+	
+				db.rollback()
+				dbglog('Error in db commit. Transaction rolled back')
+				
+		else:
+			dbglog('Changing Paths - generating SQL statements')
+			our_select = "SELECT strPath from path WHERE strPath Like '" + old_path + "%'"
+			xbmc.executebuiltin( "ActivateWindow(busydialog)" )
+			cursor.execute(our_select)
+			tempcount=0
+			for strPath in cursor:
+				renamepath_list.append( ''.join(strPath))
+				#dbglog(renamepath_list[tempcount])
+				tempcount+=1
+				
+			for i in range(len(renamepath_list)):
+				our_old_path = renamepath_list[i]
+				our_new_path = our_old_path.replace(old_path, new_path,1)
+				#our_new_path = our_path.replace(old_path, new_path,1)
+				sql = 'UPDATE path SET strPath ="' + our_new_path + '" WHERE strPath LIKE "' +our_old_path + '"'
+##				sql.replace(old_path, new_path,1)
+				dbglog('SQL - %s' % sql)
+				try:
+					cursor.execute(sql)
+					db.commit()
+				except Exception as e:
+					xbmcgui.Dialog().ok(addonname, "Error - %s " % e)
+					db.rollback()
+					dbglog('Error in db commit. Transaction rolled back')
+	
+		# disconnect from server
+		xbmc.executebuiltin( "Dialog.Close(busydialog)" )
 		db.close()
 
 		if autoclean:
