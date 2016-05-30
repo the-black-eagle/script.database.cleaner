@@ -1,3 +1,7 @@
+Version 0.5.5   30/05/16
+
+[Add]    Ability to rename a path inside the database
+
 Version 0.5.4	26/05/16
 
 [Add]	 Ability to remove a specific path from the path table in the database

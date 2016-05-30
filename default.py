@@ -9,6 +9,7 @@
 # Version 28b/1 - New GUI, several code fixes
 # Version 28b/2 - Fix the WINDOWS KODI temp path
 # Version 28b/3 - Tidy up temp path code, remove some unused code
+# Version 29b/1 - Add ability to rename paths inside the db
 
 
 import datetime
@@ -645,25 +646,22 @@ if addon:
 			xbmc.executebuiltin( "ActivateWindow(busydialog)" )
 			cursor.execute(our_select)
 			tempcount=0
-			for strPath in cursor:
+			renamepath_list = [] 
+			for strPath in cursor:	# build a list of paths to change
 				renamepath_list.append( ''.join(strPath))
-				#dbglog(renamepath_list[tempcount])
-				tempcount+=1
+				tempcount += 1
 				
 			for i in range(len(renamepath_list)):
 				our_old_path = renamepath_list[i]
 				our_new_path = our_old_path.replace(old_path, new_path,1)
-				#our_new_path = our_path.replace(old_path, new_path,1)
 				sql = 'UPDATE path SET strPath ="' + our_new_path + '" WHERE strPath LIKE "' +our_old_path + '"'
-##				sql.replace(old_path, new_path,1)
 				dbglog('SQL - %s' % sql)
 				try:
 					cursor.execute(sql)
 					db.commit()
 				except Exception as e:
-					xbmcgui.Dialog().ok(addonname, "Error - %s " % e)
 					db.rollback()
-					dbglog('Error in db commit. Transaction rolled back')
+					dbglog('Error in db commit %s. Transaction rolled back' % e)
 	
 		# disconnect from server
 		xbmc.executebuiltin( "Dialog.Close(busydialog)" )

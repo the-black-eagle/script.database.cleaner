@@ -25,23 +25,26 @@ manually.  You have the option to either abort the script, or to clean the datab
 Clicking on 'CLEAN' will run the cleaner, clicking on 'ABORT' will exit the script
 with no changes made to the database.
 
-Optionally, a user may choose to delete a specific path from their database.  This
-setting can be found in the add-on settings under 'advanced'.  When enabled, the user
-must specify the path to be removed.  The add-on will not in this case remove anything
-from the file table, but will instead remove the specified path from the path database and
-(optionally) call Kodi's built in clean library routine to clean the other tables.
-
 Once users are happy that the script is working correctly, this prompt can
 be turned off in the add-on settings enabling the script to run silently.
 
-The script now creates a logfile containing details of the paths removed.  This can be
+Optionally, a user may choose to delete a specific path from their database or to
+rename a path.  These settings can be found in the add-on settings under 'advanced' and
+are mutually exclusive.  When enabled, the user must specify the path to be removed or the old path
+and the intended new path. This can be useful if you have moved a directory on an HDD.
+The addon can update the old path to the new path without having to remove any content and re-scan.
+When operating in either of these modes, the add-on will not remove anything from the file table,
+but will instead remove or replace the specified path in the path table of the database
+and (optionally) call Kodi's built in clean library routine to clean/alter the other tables.
+
+The script creates a logfile containing details of the paths removed or renamed.  This can be
 found in Kodi's 'temp' directory.  The log is called 'database-cleaner.log'.  If the
 log already exists, it will be renamed to 'database-cleaner.old.log'.  The script will
 write to the log even if you 'abort' the clean.  This allows users to do a 'dry run' to
-see exactly what paths are going to be removed from their database before actually
+see exactly what paths are going to be affected in the database before actually
 doing so.
 
-When the script cleaning has finished, the script calls Kodi's built in 'clean
+When the script cleaning/renaming has finished, the script calls Kodi's built in 'clean
 library' routine to clean the other tables in the database.  This can also
 be turned off in the settings but this is not recommended.
 
