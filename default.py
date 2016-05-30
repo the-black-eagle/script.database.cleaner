@@ -8,7 +8,7 @@
 # Version 27b/9 - Batter Pudding tweaks the debug logging
 # Version 28b/1 - New GUI, several code fixes
 # Version 28b/2 - Fix the WINDOWS KODI temp path
-#
+# Version 28b/3 - Tidy up temp path code, remove some unused code
 
 
 import datetime
@@ -47,7 +47,7 @@ class MyClass(xbmcgui.WindowXMLDialog):
 		log('Centre is %d ' %self.centre)
 		self.strActionInfo = xbmcgui.ControlLabel( 868, 10, 400, 200, '', 'font13', '0xFFFF00FF')
 		self.addControl(self.strActionInfo)
-#		self.strActionInfo.setLabel('[B]DATABASE CLEANER - INFO[/B]')
+
 		self.offset = 28
 	#		List paths from sources.xml 
 		self.display_list = display_list
@@ -239,15 +239,16 @@ def dbglog(txt):
 		log(txt)
 		
 def cleaner_log_file(our_select, cleaning):
-	cleaner_log = xbmc.translatePath('special://temp').decode('utf-8')
-	if xbmcvfs.exists(cleaner_log + 'database-cleaner.log') and cleaning:
+	cleaner_log = xbmc.translatePath('special://temp/database-cleaner.log').decode('utf-8')
+	old_cleaner_log = xbmc.translatePath('special://temp/database-cleaner.old.log').decode('utf-8')
+	if xbmcvfs.exists(cleaner_log) and cleaning:
 		dbglog('database-cleaner.log exists - renaming to old.log')
-		xbmcvfs.delete(cleaner_log +'database-cleaner.old.log')
-		xbmcvfs.copy(cleaner_log + 'database-cleaner.log' , cleaner_log + 'database-cleaner.old.log')
-		xbmcvfs.delete(cleaner_log + 'database-cleaner.log')
-	elif xbmcvfs.exists(cleaner_log + 'database-cleaner.log') and not cleaning:
-		xbmcvfs.delete(cleaner_log + 'database-cleaner.log')
-	logfile = xbmcvfs.File(cleaner_log + 'database-cleaner.log', 'w')
+		xbmcvfs.delete(old_cleaner_log)
+		xbmcvfs.copy(cleaner_log, old_cleaner_log)
+		xbmcvfs.delete(cleaner_log)
+	elif xbmcvfs.exists(cleaner_log) and not cleaning:
+		xbmcvfs.delete(cleaner_log)
+	logfile = xbmcvfs.File(cleaner_log, 'w')
 	cursor.execute(our_select)
 	if not cleaning:
 		logfile.write('The following file paths would be removed from your database')
@@ -541,10 +542,7 @@ if addon:
 			sql = """DELETE FROM files WHERE idPath IN (SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath LIKE 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%')));"""
 			
 		dbglog('SQL command is %s' % sql)
-		line1 = 'Please review the following and confirm if correct'
-		line2 = our_source_list
-		line3 = 'Are you sure ?'
-		
+				
 		our_select = sql.replace('DELETE FROM files','SELECT strPath FROM path',1)
 		dbglog('Select Command is %s' % our_select)
 	else:		# cleaning a specific path
@@ -554,15 +552,10 @@ if addon:
 			dbglog('Select Command is %s' % our_select)
 		else:
 			dbglog("Error - Specific path selected with no path defined")
-	
+			exit(1)
 	
 	cleaner_log_file(our_select, False)
 		
-#	mydisplay = MyClass()
-#	mydisplay.doModal()
-#	del mydisplay
-#	dialog = xbmcgui.Dialog()
-#	dialog.ok(addonname, 'flag is %d ' % flag)
 	if promptdelete:
 		mydisplay = MyClass('cleaner-window.xml', addonpath)
 		mydisplay.doModal()
@@ -571,8 +564,7 @@ if addon:
 			i = True
 		else:
 			i = False
-#		dialog = xbmcgui.Dialog()
-#		i = dialog.yesno(addonname, line1, line2, line3)
+
 	else:
 		i = True
 	if i:
