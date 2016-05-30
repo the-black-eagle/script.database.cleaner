@@ -25,6 +25,12 @@ manually.  You have the option to either abort the script, or to clean the datab
 Clicking on 'CLEAN' will run the cleaner, clicking on 'ABORT' will exit the script
 with no changes made to the database.
 
+Optionally, a user may choose to delete a specific path from their database.  This
+setting can be found in the add-on settings under 'advanced'.  When enabled, the user
+must specify the path to be removed.  The add-on will not in this case remove anything
+from the file table, but will instead remove the specified path from the path database and
+(optionally) call Kodi's built in clean library routine to clean the other tables.
+
 Once users are happy that the script is working correctly, this prompt can
 be turned off in the add-on settings enabling the script to run silently.
 
