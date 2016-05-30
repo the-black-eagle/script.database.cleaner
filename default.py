@@ -115,6 +115,12 @@ class MyClass(xbmcgui.WindowXMLDialog):
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('Cleaning a specific path')
 			self.offset += 28
+		if replacepath:
+			self.strActionInfo = xbmcgui.ControlLabel (1100,400 + self.offset,550,100,'','font13','0xFFFFFFFF')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('Replacing a path')
+			self.offset += 28
+
 		if debugging:
 			debug_string = 'Debugging enabled'
 		else:
@@ -142,6 +148,13 @@ class MyClass(xbmcgui.WindowXMLDialog):
 			self.strActionInfo = xbmcgui.ControlLabel(292, 830, 800, 30, '', 'font13', '0xFFFFFFFF')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('- Removing specific path %s ' % specific_path_to_remove)
+		if replacepath:
+			self.strActionInfo = xbmcgui.ControlLabel (200, 830, 150, 30, '', 'font18', '0xFFFF0000')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('WARNING')
+			self.strActionInfo = xbmcgui.ControlLabel(292, 830, 800, 30, '', 'font13', '0xFFFFFFFF')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('- Renaming specific path %s to %s' % old_path, new_path)
 		#	Create the buttons
 		self.button0 = xbmcgui.ControlButton(500, 950, 180, 30, "[COLOR red]ABORT[/COLOR]", alignment=2)
 		self.addControl(self.button0)
