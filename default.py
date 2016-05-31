@@ -44,79 +44,83 @@ class MyClass(xbmcgui.WindowXMLDialog):
 		self.setCoordinateResolution(0)
 		self.scaleX = self.getWidth()
 		self.centre = int(self.scaleX / 2)
-				
+		self.base_offset_x = -80
+		self.base_offset_y = -100		
 		log('Centre is %d ' %self.centre)
 		self.strActionInfo = xbmcgui.ControlLabel( 868, 10, 400, 200, '', 'font13', '0xFFFF00FF')
 		self.addControl(self.strActionInfo)
 
 		self.offset = 28
 	#		List paths from sources.xml 
-		self.display_list = display_list
-		self.strActionInfo = xbmcgui.ControlLabel(200, 120, 700, 200, '', 'font18', '0xFFFF00FF')
-		self.addControl(self.strActionInfo)
-		self.strActionInfo.setLabel('Keeping data scanned from the following paths')
-		self.mylist = xbmcgui.ControlList(200, 150, 600, 400)
-		self.addControl(self.mylist)
-		self.mylist.addItem('')
-		for i in range(len(self.display_list)):
-			self.mylist.addItem(self.display_list[i])
-		self.setFocus(self.mylist)
+		if not specificpath and not replacepath:
+			self.base_offset_x = 200
+			self.base_offset_y = 120
+			self.display_list = display_list
+			self.strActionInfo = xbmcgui.ControlLabel(self.base_offset_x,self.base_offset_y, 700, 200, '', 'font18', '0xFFFF00FF')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('Keeping data scanned from the following paths')
+			self.mylist = xbmcgui.ControlList(self.base_offset_x,self.base_offset_y+30, 600, 400)
+			self.addControl(self.mylist)
+			self.mylist.addItem('')
+			for i in range(len(self.display_list)):
+				self.mylist.addItem('[COLOR yellow]'+self.display_list[i]+'[/COLOR]')
+			self.setFocus(self.mylist)
 	#		List paths in excludes.xml (if it exists)
 		
-		self.strActionInfo = xbmcgui.ControlLabel(1060,120,400,200,'', 'font18', '0xFFFF00FF')
-		self.addControl(self.strActionInfo)
-		self.strActionInfo.setLabel('Contents of excludes.xml')
-		self.excludes_list = excludes_list
-		self.my_excludes = xbmcgui.ControlList(1060,150,500,400)
-		self.addControl(self.my_excludes)
-		self.my_excludes.addItem('')
-		if excluding:
-			for i in range(len(self.excludes_list)):
-				self.my_excludes.addItem(self.excludes_list[i])
-		else:
-			self.my_excludes.addItem("Not Present")
-		self.setFocus(self.my_excludes)	
+			self.strActionInfo = xbmcgui.ControlLabel(self.base_offset_x+860,self.base_offset_y,400,200,'', 'font18', '0xFFFF00FF')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('Contents of excludes.xml')
+			self.excludes_list = excludes_list
+			self.my_excludes = xbmcgui.ControlList(self.base_offset_x+860,self.base_offset_y+30,500,400)
+			self.addControl(self.my_excludes)
+			self.my_excludes.addItem('')
+			if excluding:
+				for i in range(len(self.excludes_list)):
+					self.my_excludes.addItem('[COLOR yellow]' + self.excludes_list[i]+ '[/COLOR]')
+			else:
+				self.my_excludes.addItem("Not Present")
+			self.setFocus(self.my_excludes)	
 	#		List the relevant addon settings
-		self.strActionInfo = xbmcgui.ControlLabel(1060,375,400,200,'', 'font18', '0xFFFF00FF')
+		self.strActionInfo = xbmcgui.ControlLabel(self.base_offset_x+860,self.base_offset_y+255,400,200,'', 'font18', '0xFFFF00FF')
 		self.addControl(self.strActionInfo)
 		self.strActionInfo.setLabel('Addon Settings')
-		if is_pvr:
-			self.strActionInfo = xbmcgui.ControlLabel (1100 ,400 + self.offset,550,100,'','font13','0xFFFFFFFF')
+		if is_pvr and (not specificpath and not replacepath):
+			self.strActionInfo = xbmcgui.ControlLabel (self.base_offset_x+900,self.base_offset_y + self.offset+260,550,100,'','font13','0xFFFFFFFF')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('Keep PVR information')
 			self.offset += 28
-		if bookmarks:
-			self.strActionInfo = xbmcgui.ControlLabel (1100,400 + self.offset,550,100,'','font13','0xFFFFFFFF')
+		if bookmarks and (not specificpath and not replacepath):
+			self.strActionInfo = xbmcgui.ControlLabel (self.base_offset_x+900,self.base_offset_y + self.offset+260,550,100,'','font13','0xFFFFFFFF')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('Keep bookmark information')
 			self.offset += 28
 		if autoclean:
-			self.strActionInfo = xbmcgui.ControlLabel (1100 ,400 + self.offset,550,100,'','font13','0xFFFFFFFF')
+			self.strActionInfo = xbmcgui.ControlLabel (self.base_offset_x+900,self.base_offset_y + self.offset+260,550,100,'','font13','0xFFFFFFFF')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('Auto call Clean Library')
 			self.offset += 28
 		if promptdelete:
-			self.strActionInfo = xbmcgui.ControlLabel (1100,400 + self.offset,700,100,'','font13','0xFFFFFFFF')
+			self.strActionInfo = xbmcgui.ControlLabel (self.base_offset_x+900,self.base_offset_y + self.offset+260,700,100,'','font13','0xFFFFFFFF')
 			self.addControl(self.strActionInfo)
-			self.strActionInfo.setLabel('Prompt before delete (This window !!)')
+			self.strActionInfo.setLabel('Show summary window (This window !!)')
 			self.offset += 28
 		if autobackup == 'true' and not is_mysql:
-			self.strActionInfo = xbmcgui.ControlLabel (1100,400 + self.offset,550,100,'','font13','0xFFFFFFFF')
+			self.strActionInfo = xbmcgui.ControlLabel (self.base_offset_x+900,self.base_offset_y + self.offset+260,550,100,'','font13','0xFFFFFFFF')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('Auto backing up local database')
 			self.offset += 28
-		if no_sources:
-			self.strActionInfo = xbmcgui.ControlLabel (1100,400 + self.offset,550,100,'','font13','0xFFFFFFFF')
+		if no_sources or specificpath or replacepath:
+			self.strActionInfo = xbmcgui.ControlLabel (self.base_offset_x+900,self.base_offset_y + self.offset+260,550,100,'','font13','0xFFFF0000')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('Not using info from sources.xml')
 			self.offset += 28
 		if specificpath:
-			self.strActionInfo = xbmcgui.ControlLabel (1100,400 + self.offset,550,100,'','font13','0xFFFFFFFF')
+			self.strActionInfo = xbmcgui.ControlLabel (self.base_offset_x+900,self.base_offset_y + self.offset+260,550,100,'','font13','0xFFFF0000')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('Cleaning a specific path')
 			self.offset += 28
 		if replacepath:
-			self.strActionInfo = xbmcgui.ControlLabel (1100,400 + self.offset,550,100,'','font13','0xFFFFFFFF')
+			self.strActionInfo = xbmcgui.ControlLabel (self.base_offset_x+900,self.base_offset_y + self.offset+260,550,100,'','font13','0xFFFF0000')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('Replacing a path')
 			self.offset += 28
@@ -125,40 +129,43 @@ class MyClass(xbmcgui.WindowXMLDialog):
 			debug_string = 'Debugging enabled'
 		else:
 			debug_string = 'Debugging disabled'
-		self.strActionInfo = xbmcgui.ControlLabel (1100,400 + self.offset,550,100,'','font13','0xFFFFFFFF')
+		self.strActionInfo = xbmcgui.ControlLabel (self.base_offset_x+900,self.base_offset_y + self.offset+260 ,550 ,100,'','font13','0xFFFFFFFF')
 		self.addControl(self.strActionInfo)
 		self.strActionInfo.setLabel(debug_string)
 		self.offset += 45
 		#	Display the name of the database we are connected to
-		self.strActionInfo = xbmcgui.ControlLabel ( 1060, 400 + self.offset, 550, 100, '', 'font13', '0xFFFF00FF')
+		self.strActionInfo = xbmcgui.ControlLabel ( self.base_offset_x+860, self.base_offset_y + self.offset+260, 550, 100, '', 'font13', '0xFFFF00FF')
 		self.addControl(self.strActionInfo)
-		self.strActionInfo.setLabel('Database is - [B]%s[/B]' % our_dbname)
+		self.strActionInfo.setLabel('Database is - [COLOR green][B]%s[/B][/COLOR]' % our_dbname)
 		#	Show warning about backup if using MySQL	
 		if is_mysql:
 			self.strActionInfo = xbmcgui.ControlLabel (200, 800, 150, 30, '', 'font18', '0xFFFF0000')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('WARNING')
-			self.strActionInfo = xbmcgui.ControlLabel (292, 800, 800, 30, '', 'font13', '0xFFFFFFFF')
+			self.strActionInfo = xbmcgui.ControlLabel (352, 800, 800, 30, '', 'font13', '0xFFFFFFFF')
 			self.addControl(self.strActionInfo)
-			self.strActionInfo.setLabel('- MySQL database [B]not[/B] backed up automatically, please do this [B]manually[/B]')
+			self.strActionInfo.setLabel('- MySQL database [COLOR red][B]not[/B][/COLOR] backed up automatically, please do this [B]manually[/B]')
 		if specificpath:
 			self.strActionInfo = xbmcgui.ControlLabel (200, 830, 150, 30, '', 'font18', '0xFFFF0000')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('WARNING')
-			self.strActionInfo = xbmcgui.ControlLabel(292, 830, 800, 30, '', 'font13', '0xFFFFFFFF')
+			self.strActionInfo = xbmcgui.ControlLabel(352, 830, 800, 30, '', 'font13', '0xFFFFFFFF')
 			self.addControl(self.strActionInfo)
-			self.strActionInfo.setLabel('- Removing specific path %s ' % specific_path_to_remove)
+			self.strActionInfo.setLabel('- Removing specific path [COLOR yellow]%s[/COLOR] ' % specific_path_to_remove)
 		if replacepath:
 			self.strActionInfo = xbmcgui.ControlLabel (200, 830, 150, 30, '', 'font18', '0xFFFF0000')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('WARNING')
-			self.strActionInfo = xbmcgui.ControlLabel(292, 830, 800, 30, '', 'font13', '0xFFFFFFFF')
+			self.strActionInfo = xbmcgui.ControlLabel(352, 830, 800, 30, '', 'font13', '0xFFFFFFFF')
 			self.addControl(self.strActionInfo)
-			self.strActionInfo.setLabel('- Renaming specific path %s to %s' % old_path, new_path)
+			self.strActionInfo.setLabel('- Renaming specific path from [COLOR yellow]%s[/COLOR] ' % old_path)
+			self.strActionInfo = xbmcgui.ControlLabel(352, 860, 800, 30, '', 'font13', '0xFFFFFFFF')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('- to  [COLOR yellow]%s[/COLOR] ' % new_path)
 		#	Create the buttons
 		self.button0 = xbmcgui.ControlButton(500, 950, 180, 30, "[COLOR red]ABORT[/COLOR]", alignment=2)
 		self.addControl(self.button0)
-		self.button1 = xbmcgui.ControlButton(1300, 950, 180, 30, "[COLOR green]CLEAN[/COLOR]", alignment=2)
+		self.button1 = xbmcgui.ControlButton(1300, 950, 180, 30, "[COLOR green]DO IT ![/COLOR]", alignment=2)
 		self.addControl(self.button1)
 		self.setFocus(self.button0)
 		button_abort = self.button0.getId()
@@ -497,7 +504,7 @@ if addon:
 			dbglog('Unable to connect to forced database s%' % forcedname)
 			exit(1)
 
-	cursor = db.cursor(buffered=True)
+	cursor = db.cursor()
 	
 	if xbmcvfs.exists(excludes_file):
 		excludes_list =[]

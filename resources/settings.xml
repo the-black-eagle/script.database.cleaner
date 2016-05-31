@@ -7,9 +7,9 @@
         <setting id="autoclean" label="32003" type="bool" default="true"/>
         <setting id="autobackup" label="32015" type="bool" default="true"/>
         <setting id="backupname" label="32016" type="text" default="" enable="eq(-1,true)"/>
+        <setting id="promptdelete" label="32007" type="bool" default="true"/>
         <setting type="sep"/>
         <setting label="32004" type="lsep"/>
-        <setting id="promptdelete" label="32007" type="bool" default="true"/>
         <setting id="debugging" label="32005" type="bool" default="false"/>
     </category>
     <category label="32010">

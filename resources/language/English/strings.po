@@ -41,7 +41,7 @@ msgid "Keep any bookmarked files"
 msgstr ""
 
 msgctxt "#32007"
-msgid "Prompt before actually deleting anything"
+msgid "Show summary window"
 msgstr ""
 
 msgctxt "#32010"
