@@ -15,18 +15,18 @@ their database.
 Users can also choose (via the add-on settings) to retain or remove old 
 PVR information and to retain or remove bookmarks.
 
-When run, the script will prompt with a dialog window containing a list
+When run, the script will prompt with a summary window containing a list
 of the paths to retain in the database. Users are encouraged to check that 
 all their defined sources are indeed listed. The current settings for the add-on
 are also displayed, along with the contents of any 'excludes.xml' file.
 The name of the currently connected database is also displayed.
 If you are using MySQL, there will also be a warning to back up your database
 manually.  You have the option to either abort the script, or to clean the database. 
-Clicking on 'CLEAN' will run the cleaner, clicking on 'ABORT' will exit the script
+Clicking on 'DO IT !!' will run the cleaner, clicking on 'ABORT' will exit the script
 with no changes made to the database.
 
-Once users are happy that the script is working correctly, this prompt can
-be turned off in the add-on settings enabling the script to run silently.
+Once users are happy that the script is working correctly, this summary can
+be disabled in the add-on settings allowing the script to run silently.
 
 Optionally, a user may choose to delete a specific path from their database or to
 rename a path.  These settings can be found in the add-on settings under 'advanced' and
@@ -36,9 +36,12 @@ The addon can update the old path to the new path without having to remove any c
 When operating in either of these modes, the add-on will not remove anything from the file table,
 but will instead remove or replace the specified path in the path table of the database
 and (optionally) call Kodi's built in clean library routine to clean/alter the other tables.
+If a user elects to remove or rename a path then once this procedure has been completed, the
+relevant setting will be automatically disabled again.  Aborting the addon at the summary page
+DOES NOT reset these settings but does produce a logfile as detailed below.
 
-The script creates a logfile containing details of the paths removed or renamed.  This can be
-found in Kodi's 'temp' directory.  The log is called 'database-cleaner.log'.  If the
+From V0.5.4 a logfile containing details of the paths removed or renamed is created and
+can be found in Kodi's 'temp' directory.  The log is called 'database-cleaner.log'.  If the
 log already exists, it will be renamed to 'database-cleaner.old.log'.  The script will
 write to the log even if you 'abort' the clean.  This allows users to do a 'dry run' to
 see exactly what paths are going to be affected in the database before actually
