@@ -589,6 +589,9 @@ if addon:
 		dbglog('SQL command is %s' % sql)
 				
 		our_select = sql.replace('DELETE FROM files','SELECT strPath FROM path',1)
+		if bookmarks: # bookmarks require a join to handle selecting paths 
+			our_select = sql.replace('DELETE FROM files', 'SELECT strPath FROM path FULL JOIN bookmark on idFile', 1)
+			our_select.replace(' AND idFile NOT IN (SELECT idFile FROM bookmark)', ' OR idFile NOT IN (SELECT idFile FROM bookmark)',1)
 		dbglog('Select Command is %s' % our_select)
 	elif not replacepath and specificpath:		# cleaning a specific path
 		if specific_path_to_remove != '':
@@ -686,6 +689,13 @@ if addon:
 		# disconnect from server
 		xbmc.executebuiltin( "Dialog.Close(busydialog)" )
 		db.close()
+		
+		# Make sure replacing or changing a path is a one-shot deal
+		
+		if replacepath or specificpath:
+			addon.setSetting('specificpath', 'false')
+			addon.setSetting('replacepath', 'false')
+
 
 		if autoclean:
 			xbmcgui.Dialog().notification(addonname,
