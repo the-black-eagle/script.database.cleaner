@@ -10,6 +10,7 @@
 # Version 28b/2 - Fix the WINDOWS KODI temp path
 # Version 28b/3 - Tidy up temp path code, remove some unused code
 # Version 29b/1 - Add ability to rename paths inside the db
+# Version 29/b2 - Fix incorrectly altered SQL
 
 
 import datetime
@@ -21,6 +22,8 @@ import sqlite3
 import xml.etree.ElementTree as ET
 
 import mysql.connector
+
+from sys import platform as _platform
 
 import xbmc
 
@@ -44,108 +47,133 @@ class MyClass(xbmcgui.WindowXMLDialog):
 		self.setCoordinateResolution(0)
 		self.scaleX = self.getWidth()
 		self.centre = int(self.scaleX / 2)
-				
+		self.base_offset_x = -80
+		self.base_offset_y = -100		
 		log('Centre is %d ' %self.centre)
 		self.strActionInfo = xbmcgui.ControlLabel( 868, 10, 400, 200, '', 'font13', '0xFFFF00FF')
 		self.addControl(self.strActionInfo)
 
 		self.offset = 28
 	#		List paths from sources.xml 
-		self.display_list = display_list
-		self.strActionInfo = xbmcgui.ControlLabel(200, 120, 700, 200, '', 'font18', '0xFFFF00FF')
-		self.addControl(self.strActionInfo)
-		self.strActionInfo.setLabel('Keeping data scanned from the following paths')
-		self.mylist = xbmcgui.ControlList(200, 150, 600, 400)
-		self.addControl(self.mylist)
-		self.mylist.addItem('')
-		for i in range(len(self.display_list)):
-			self.mylist.addItem(self.display_list[i])
-		self.setFocus(self.mylist)
+		if not specificpath and not replacepath:
+			self.base_offset_x = 200
+			self.base_offset_y = 120
+			self.display_list = display_list
+			self.strActionInfo = xbmcgui.ControlLabel(self.base_offset_x,self.base_offset_y, 700, 200, '', 'font18', '0xFFFF00FF')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('Keeping data scanned from the following paths')
+			self.mylist = xbmcgui.ControlList(self.base_offset_x,self.base_offset_y+30, 600, 400)
+			self.addControl(self.mylist)
+			self.mylist.addItem('')
+			for i in range(len(self.display_list)):
+				self.mylist.addItem('[COLOR yellow]'+self.display_list[i]+'[/COLOR]')
+			self.setFocus(self.mylist)
 	#		List paths in excludes.xml (if it exists)
 		
-		self.strActionInfo = xbmcgui.ControlLabel(1060,120,400,200,'', 'font18', '0xFFFF00FF')
-		self.addControl(self.strActionInfo)
-		self.strActionInfo.setLabel('Contents of excludes.xml')
-		self.excludes_list = excludes_list
-		self.my_excludes = xbmcgui.ControlList(1060,150,500,400)
-		self.addControl(self.my_excludes)
-		self.my_excludes.addItem('')
-		if excluding:
-			for i in range(len(self.excludes_list)):
-				self.my_excludes.addItem(self.excludes_list[i])
-		else:
-			self.my_excludes.addItem("Not Present")
-		self.setFocus(self.my_excludes)	
+			self.strActionInfo = xbmcgui.ControlLabel(self.base_offset_x+860,self.base_offset_y,400,200,'', 'font18', '0xFFFF00FF')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('Contents of excludes.xml')
+			self.excludes_list = excludes_list
+			self.my_excludes = xbmcgui.ControlList(self.base_offset_x+860,self.base_offset_y+30,500,400)
+			self.addControl(self.my_excludes)
+			self.my_excludes.addItem('')
+			if excluding:
+				for i in range(len(self.excludes_list)):
+					self.my_excludes.addItem('[COLOR yellow]' + self.excludes_list[i]+ '[/COLOR]')
+			else:
+				self.my_excludes.addItem("Not Present")
+			self.setFocus(self.my_excludes)	
 	#		List the relevant addon settings
-		self.strActionInfo = xbmcgui.ControlLabel(1060,375,400,200,'', 'font18', '0xFFFF00FF')
+		self.strActionInfo = xbmcgui.ControlLabel(self.base_offset_x+860,self.base_offset_y+255,400,200,'', 'font18', '0xFFFF00FF')
 		self.addControl(self.strActionInfo)
 		self.strActionInfo.setLabel('Addon Settings')
-		if is_pvr:
-			self.strActionInfo = xbmcgui.ControlLabel (1100 ,400 + self.offset,550,100,'','font13','0xFFFFFFFF')
+		if is_pvr and (not specificpath and not replacepath):
+			self.strActionInfo = xbmcgui.ControlLabel (self.base_offset_x+900,self.base_offset_y + self.offset+260,550,100,'','font13','0xFFFFFFFF')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('Keep PVR information')
 			self.offset += 28
-		if bookmarks:
-			self.strActionInfo = xbmcgui.ControlLabel (1100,400 + self.offset,550,100,'','font13','0xFFFFFFFF')
+		if bookmarks and (not specificpath and not replacepath):
+			self.strActionInfo = xbmcgui.ControlLabel (self.base_offset_x+900,self.base_offset_y + self.offset+260,550,100,'','font13','0xFFFFFFFF')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('Keep bookmark information')
 			self.offset += 28
 		if autoclean:
-			self.strActionInfo = xbmcgui.ControlLabel (1100 ,400 + self.offset,550,100,'','font13','0xFFFFFFFF')
+			self.strActionInfo = xbmcgui.ControlLabel (self.base_offset_x+900,self.base_offset_y + self.offset+260,550,100,'','font13','0xFFFFFFFF')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('Auto call Clean Library')
 			self.offset += 28
 		if promptdelete:
-			self.strActionInfo = xbmcgui.ControlLabel (1100,400 + self.offset,700,100,'','font13','0xFFFFFFFF')
+			self.strActionInfo = xbmcgui.ControlLabel (self.base_offset_x+900,self.base_offset_y + self.offset+260,700,100,'','font13','0xFFFFFFFF')
 			self.addControl(self.strActionInfo)
-			self.strActionInfo.setLabel('Prompt before delete (This window !!)')
+			self.strActionInfo.setLabel('Show summary window (This window !!)')
 			self.offset += 28
 		if autobackup == 'true' and not is_mysql:
-			self.strActionInfo = xbmcgui.ControlLabel (1100,400 + self.offset,550,100,'','font13','0xFFFFFFFF')
+			self.strActionInfo = xbmcgui.ControlLabel (self.base_offset_x+900,self.base_offset_y + self.offset+260,550,100,'','font13','0xFFFFFFFF')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('Auto backing up local database')
 			self.offset += 28
-		if no_sources:
-			self.strActionInfo = xbmcgui.ControlLabel (1100,400 + self.offset,550,100,'','font13','0xFFFFFFFF')
+		if no_sources or specificpath or replacepath:
+			self.strActionInfo = xbmcgui.ControlLabel (self.base_offset_x+900,self.base_offset_y + self.offset+260,550,100,'','font13','0xFFFF0000')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('Not using info from sources.xml')
 			self.offset += 28
 		if specificpath:
-			self.strActionInfo = xbmcgui.ControlLabel (1100,400 + self.offset,550,100,'','font13','0xFFFFFFFF')
+			self.strActionInfo = xbmcgui.ControlLabel (self.base_offset_x+900,self.base_offset_y + self.offset+260,550,100,'','font13','0xFFFF0000')
 			self.addControl(self.strActionInfo)
-			self.strActionInfo.setLabel('Cleaning a specific path')
+			self.strActionInfo.setLabel('[COLOR red]Cleaning a specific path[/COLOR]')
 			self.offset += 28
+		if replacepath:
+			self.strActionInfo = xbmcgui.ControlLabel (self.base_offset_x+900,self.base_offset_y + self.offset+260,550,100,'','font13','0xFFFF0000')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('[COLOR red]Replacing a path[/COLOR]')
+			self.offset += 28
+		if enable_logging:
+			self.strActionInfo = xbmcgui.ControlLabel (self.base_offset_x+900,self.base_offset_y + self.offset+260,550,100,'','font13','0xFFFF0000')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('Writing a logfile to Kodi TEMP directory')
+			self.offset += 28
+
 		if debugging:
 			debug_string = 'Debugging enabled'
 		else:
 			debug_string = 'Debugging disabled'
-		self.strActionInfo = xbmcgui.ControlLabel (1100,400 + self.offset,550,100,'','font13','0xFFFFFFFF')
+		self.strActionInfo = xbmcgui.ControlLabel (self.base_offset_x+900,self.base_offset_y + self.offset+260 ,550 ,100,'','font13','0xFFFFFFFF')
 		self.addControl(self.strActionInfo)
 		self.strActionInfo.setLabel(debug_string)
 		self.offset += 45
 		#	Display the name of the database we are connected to
-		self.strActionInfo = xbmcgui.ControlLabel ( 1060, 400 + self.offset, 550, 100, '', 'font13', '0xFFFF00FF')
+		self.strActionInfo = xbmcgui.ControlLabel ( self.base_offset_x+860, self.base_offset_y + self.offset+260, 550, 100, '', 'font13', '0xFFFF00FF')
 		self.addControl(self.strActionInfo)
-		self.strActionInfo.setLabel('Database is - [B]%s[/B]' % our_dbname)
+		self.strActionInfo.setLabel('Database is - [COLOR green][B]%s[/B][/COLOR]' % our_dbname)
 		#	Show warning about backup if using MySQL	
 		if is_mysql:
 			self.strActionInfo = xbmcgui.ControlLabel (200, 800, 150, 30, '', 'font18', '0xFFFF0000')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('WARNING')
-			self.strActionInfo = xbmcgui.ControlLabel (292, 800, 800, 30, '', 'font13', '0xFFFFFFFF')
+			self.strActionInfo = xbmcgui.ControlLabel (352, 800, 800, 30, '', 'font13', '0xFFFFFFFF')
 			self.addControl(self.strActionInfo)
-			self.strActionInfo.setLabel('- MySQL database [B]not[/B] backed up automatically, please do this [B]manually[/B]')
+			self.strActionInfo.setLabel('- MySQL database [COLOR red][B]not[/B][/COLOR] backed up automatically, please do this [B]manually[/B]')
 		if specificpath:
 			self.strActionInfo = xbmcgui.ControlLabel (200, 830, 150, 30, '', 'font18', '0xFFFF0000')
 			self.addControl(self.strActionInfo)
 			self.strActionInfo.setLabel('WARNING')
-			self.strActionInfo = xbmcgui.ControlLabel(292, 830, 800, 30, '', 'font13', '0xFFFFFFFF')
+			self.strActionInfo = xbmcgui.ControlLabel(352, 830, 800, 30, '', 'font13', '0xFFFFFFFF')
 			self.addControl(self.strActionInfo)
-			self.strActionInfo.setLabel('- Removing specific path %s ' % specific_path_to_remove)
+			self.strActionInfo.setLabel('- Removing specific path [COLOR yellow]%s[/COLOR] ' % specific_path_to_remove)
+		if replacepath:
+			self.strActionInfo = xbmcgui.ControlLabel (200, 830, 150, 30, '', 'font18', '0xFFFF0000')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('WARNING')
+			self.strActionInfo = xbmcgui.ControlLabel(352, 830, 800, 30, '', 'font13', '0xFFFFFFFF')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('- Renaming specific path from [COLOR yellow]%s[/COLOR] ' % old_path)
+			self.strActionInfo = xbmcgui.ControlLabel(352, 860, 800, 30, '', 'font13', '0xFFFFFFFF')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('- to  [COLOR yellow]%s[/COLOR] ' % new_path)
 		#	Create the buttons
 		self.button0 = xbmcgui.ControlButton(500, 950, 180, 30, "[COLOR red]ABORT[/COLOR]", alignment=2)
 		self.addControl(self.button0)
-		self.button1 = xbmcgui.ControlButton(1300, 950, 180, 30, "[COLOR green]CLEAN[/COLOR]", alignment=2)
+		self.button1 = xbmcgui.ControlButton(1300, 950, 180, 30, "[COLOR green]DO IT ![/COLOR]", alignment=2)
 		self.addControl(self.button1)
 		self.setFocus(self.button0)
 		button_abort = self.button0.getId()
@@ -191,6 +219,7 @@ excludes_file = xbmc.translatePath('special://profile/addon_data/script.database
 db_path = xbmc.translatePath('special://database').decode('utf-8')
 userdata_path = xbmc.translatePath('special://userdata').decode('utf-8')
 
+type_of_log =''
 is_pvr = addon.getSetting('pvr')
 autoclean = addon.getSetting('autoclean')
 bookmarks = addon.getSetting('bookmark')
@@ -203,6 +232,13 @@ specificpath = addon.getSetting('specificpath')
 backup_filename = addon.getSetting('backupname')
 forcedbname = addon.getSetting('overridedb')
 replacepath = addon.getSetting('replacepath')
+enable_logging = addon.getSetting('logtolog')
+if enable_logging == 'true':
+	enable_logging = True
+	type_of_log = addon.getSetting('typeoflog')
+	
+else:
+	enable_logging = False
 if replacepath == 'true':
 	replacepath = True
 else:
@@ -247,17 +283,41 @@ def dbglog(txt):
 	if debugging:
 		log(txt)
 		
+		
 def cleaner_log_file(our_select, cleaning):
 	cleaner_log = xbmc.translatePath('special://temp/database-cleaner.log').decode('utf-8')
 	old_cleaner_log = xbmc.translatePath('special://temp/database-cleaner.old.log').decode('utf-8')
-	if xbmcvfs.exists(cleaner_log) and cleaning:
-		dbglog('database-cleaner.log exists - renaming to old.log')
-		xbmcvfs.delete(old_cleaner_log)
-		xbmcvfs.copy(cleaner_log, old_cleaner_log)
-		xbmcvfs.delete(cleaner_log)
-	elif xbmcvfs.exists(cleaner_log) and not cleaning:
-		xbmcvfs.delete(cleaner_log)
-	logfile = xbmcvfs.File(cleaner_log, 'w')
+		
+	if not enable_logging:
+		return
+	if type_of_log == 0:
+		if cleaning:
+			if xbmcvfs.exists(cleaner_log):
+				dbglog('database-cleaner.log exists - renaming to old.log')
+				xbmcvfs.delete(old_cleaner_log)
+				xbmcvfs.copy(cleaner_log, old_cleaner_log)
+				xbmcvfs.delete(cleaner_log)
+		else:
+			xbmcvfs.delete(cleaner_log)
+	else:
+		if cleaning:
+			if xbmcvfs.exists(cleaner_log):
+				dbglog('database-cleaner.log exists - backing up to old.log')
+				xbmcvfs.delete(old_cleaner_log)
+				xbmcvfs.copy(cleaner_log, old_cleaner_log)
+		old_log= xbmcvfs.File(cleaner_log)
+		old_log_contents=old_log.read()
+		old_log.close()
+	
+	now = datetime.datetime.now()
+	logfile=xbmcvfs.File(cleaner_log, 'w')
+	if old_log_contents:
+		logfile.write(old_log_contents)
+	
+	logfile_header = 'Video Database Cleaner - Running at ' + now.strftime('%c') + '\n'
+	logfile_header = logfile_header + ' Running on ' + _platform +'\n\n'
+	logfile.write(logfile_header)
+
 	cursor.execute(our_select)
 	if not cleaning and not replacepath:
 		logfile.write('The following file paths would be removed from your database')
@@ -273,28 +333,25 @@ def cleaner_log_file(our_select, cleaning):
 		logfile.write('\n\n')
 	if not specificpath and not replacepath:
 		for strPath in cursor:
-			mystring = u'Removing unused path '.join(strPath) + '\n'
+			mystring = u''.join(strPath) + '\n'
 			outdata = mystring.encode('utf-8')
 			dbglog('Removing unused path %s' % strPath)
 			logfile.write(outdata)
 	elif specificpath and not replacepath:
-		mystring = u'Removing specific path ' + specific_path_to_remove + '\n'
-		outdata = mystring.encode('utf-8')
 		dbglog('Removing specific path %s' % specific_path_to_remove)
 		for strPath in cursor:
-			mystring = u'Removing unwanted path '.join(strPath) + '\n'
+			mystring = u''.join(strPath) + '\n'
 			outdata = mystring.encode('utf-8')
 			dbglog('Removing unwanted path %s' % strPath)
 			logfile.write(outdata)
 	else:
-		mystring = u'Changing path '+ old_path + 'to ' + new_path + '\n'
-		outdata = mystring.encode('utf-8')
 		for strPath in cursor:
-			mystring = u' changing path '.join(strPath) + '\n'
+			mystring = u''.join(strPath) + '\n'
 			outdata = mystring.encode('utf-8')
 			dbglog('Changing path %s' % strPath)
 			logfile.write(outdata)
 		our_data = cursor
+	logfile.write('\n\n')
 	logfile.close()
 	
 		
@@ -484,7 +541,7 @@ if addon:
 			dbglog('Unable to connect to forced database s%' % forcedname)
 			exit(1)
 
-	cursor = db.cursor(buffered=True)
+	cursor = db.cursor()
 	
 	if xbmcvfs.exists(excludes_file):
 		excludes_list =[]
@@ -559,16 +616,20 @@ if addon:
 		if excluding:
 			my_command = my_command + exclude_command
 			our_source_list = our_source_list + 'Keeping items from excludes.xml '
-	if not specificpath and not replacepath:			
+				
 # Build SQL query	
 		if my_command:
-			sql = """DELETE FROM files WHERE idPath IN ( SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath LIKE 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%') AND (""" + my_command + """)));"""
+			sql = """DELETE FROM files WHERE idPath IN ( SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath Like 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%' OR strPath LIKE 'pvr://%') AND (""" + my_command + """)));"""
 		else:
 			sql = """DELETE FROM files WHERE idPath IN (SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath LIKE 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%')));"""
 			
-		dbglog('SQL command is %s' % sql)
-				
+	dbglog('SQL command is %s' % sql)
+	if not specificpath and not replacepath:
+		dbglog (our_source_list)			
 		our_select = sql.replace('DELETE FROM files','SELECT strPath FROM path',1)
+#		if bookmarks: # bookmarks require a join to handle selecting paths 
+#			our_select = sql.replace('DELETE FROM files', 'SELECT strPath FROM path JOIN bookmark on idFile', 1)
+#			our_select.replace(' AND idFile NOT IN (SELECT idFile FROM bookmark)', ' OR idFile NOT IN (SELECT idFile FROM bookmark)',1)
 		dbglog('Select Command is %s' % our_select)
 	elif not replacepath and specificpath:		# cleaning a specific path
 		if specific_path_to_remove != '':
@@ -666,6 +727,13 @@ if addon:
 		# disconnect from server
 		xbmc.executebuiltin( "Dialog.Close(busydialog)" )
 		db.close()
+		
+		# Make sure replacing or changing a path is a one-shot deal
+		
+		if replacepath or specificpath:
+			addon.setSetting('specificpath', 'false')
+			addon.setSetting('replacepath', 'false')
+
 
 		if autoclean:
 			xbmcgui.Dialog().notification(addonname,

@@ -20,6 +20,7 @@
 				<width>1720</width>
 				<height>1020</height>
 				<texture border="80">background.png</texture>
+				<colordiffuse>DDFFFFFF</colordiffuse>
 			</control>
 			<control type="image">
 				<description>icon</description>
