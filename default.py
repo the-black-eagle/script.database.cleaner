@@ -319,9 +319,9 @@ def cleaner_log_file(our_select, cleaning):
 		logfile.write(old_log_contents)
 	more_info = platform.dist()
 	more_info = str(more_info).replace("'","",20)
-	more_info = the_platform.replace(",","",1)
+	more_info = more_info.replace(",","",1)
 	running_platform = platform.system()
-	logfile_header = 'Video Database Cleaner V %s - Running on '+ str(running_platform) +' ' +  str(more_info) + ' at ' + now.strftime('%c') + '\n\n' % addonversion
+	logfile_header = 'Video Database Cleaner V' + addonversion+ ' - Running on '+ str(running_platform) +' ' +  str(more_info) + ' at ' + now.strftime('%c') + '\n\n'
 	logfile.write(logfile_header)
 
 	cursor.execute(our_select)
