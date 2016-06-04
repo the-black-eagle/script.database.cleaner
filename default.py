@@ -341,7 +341,7 @@ def cleaner_log_file(our_select, cleaning):
 		for strPath in cursor:
 			mystring = u''.join(strPath) + '\n'
 			outdata = mystring.encode('utf-8')
-			dbglog('Removing unused path %s' % strPath)
+			dbglog('Removing non sources.xml path %s' % strPath)
 			logfile.write(outdata)
 	elif specificpath and not replacepath:
 		dbglog('Removing specific path %s' % specific_path_to_remove)
@@ -537,13 +537,14 @@ if addon:
 		testpath = db_path + forcedname + '.db'
 		if not xbmcvfs.exists(testpath):
 			dbglog('Forced version of database does not exist')
-			xbmcgui.Dialog().ok(addonname,'Forced version of database not found. Script will now exit')
+			xbmcgui.Dialog().ok(addonname,'Error - Forced version of database ( %s ) not found. Script will now exit' % forcedname)
 			exit(1)
 		try:
 			my_db_connector = db_path + forcedname + '.db'
 			db = sqlite3.connect(my_db_connector)
 			dbglog('Connected to forced video database')
 		except:
+			xbmcgui.Dialog().ok(addonname,'Error - Unable to connect to forced database %s. Script will now exit' % forcedname)
 			dbglog('Unable to connect to forced database s%' % forcedname)
 			exit(1)
 
@@ -644,12 +645,14 @@ if addon:
 			our_select = "SELECT strPath FROM path WHERE idPath IN (SELECT idPath FROM path WHERE (strPath LIKE'" + specific_path_to_remove + "%'))"
 			dbglog('Select Command is %s' % our_select)
 		else:
+			xbmcgui.Dialog().ok(addonname,'Error - Specific path selected but no path defined. Script aborted')
 			dbglog("Error - Specific path selected with no path defined")
 			exit(1)
 	else: # must be replacing a path at this point
 		if old_path != '' and new_path != '':
 			our_select = "SELECT strPath from path WHERE strPath Like '" + old_path + "%'"
 		else:
+			xbmcgui.Dialog().ok(addonname,'Error - Replace path selected but one or more paths are not defined. Script aborted')
 			dbglog('Error - Missing path for replacement')
 			exit(1)
 	cleaner_log_file(our_select, False)
