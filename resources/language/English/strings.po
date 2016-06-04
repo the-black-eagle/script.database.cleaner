@@ -29,11 +29,11 @@ msgid "Automatically trigger clean library"
 msgstr ""
 
 msgctxt "#32004"
-msgid "Debug Settings"
+msgid "Debug And Log Settings"
 msgstr ""
 
 msgctxt "#32005"
-msgid "Enable Debugging"
+msgid "Enable Debugging to Kodi debug log"
 msgstr ""
 
 msgctxt "#32006"
@@ -104,4 +104,18 @@ msgctxt "#32024"
 msgid " - New path"
 msgstr ""
 
+msgctxt "#32025"
+msgid "Log paths to database-cleaner.log"
+msgstr ""
 
+msgctxt "#32026"
+msgid "Log creation style"
+msgstr ""
+
+msgctxt "#32027"
+msgid "Write new log each run"
+msgstr ""
+
+msgctxt "#32028"
+msgid "Add to log each run"
+msgstr ""

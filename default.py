@@ -10,6 +10,7 @@
 # Version 28b/2 - Fix the WINDOWS KODI temp path
 # Version 28b/3 - Tidy up temp path code, remove some unused code
 # Version 29b/1 - Add ability to rename paths inside the db
+# Version 29/b2 - Fix incorrectly altered SQL
 
 
 import datetime
@@ -21,6 +22,8 @@ import sqlite3
 import xml.etree.ElementTree as ET
 
 import mysql.connector
+
+from sys import platform as _platform
 
 import xbmc
 
@@ -117,12 +120,17 @@ class MyClass(xbmcgui.WindowXMLDialog):
 		if specificpath:
 			self.strActionInfo = xbmcgui.ControlLabel (self.base_offset_x+900,self.base_offset_y + self.offset+260,550,100,'','font13','0xFFFF0000')
 			self.addControl(self.strActionInfo)
-			self.strActionInfo.setLabel('Cleaning a specific path')
+			self.strActionInfo.setLabel('[COLOR red]Cleaning a specific path[/COLOR]')
 			self.offset += 28
 		if replacepath:
 			self.strActionInfo = xbmcgui.ControlLabel (self.base_offset_x+900,self.base_offset_y + self.offset+260,550,100,'','font13','0xFFFF0000')
 			self.addControl(self.strActionInfo)
-			self.strActionInfo.setLabel('Replacing a path')
+			self.strActionInfo.setLabel('[COLOR red]Replacing a path[/COLOR]')
+			self.offset += 28
+		if enable_logging:
+			self.strActionInfo = xbmcgui.ControlLabel (self.base_offset_x+900,self.base_offset_y + self.offset+260,550,100,'','font13','0xFFFF0000')
+			self.addControl(self.strActionInfo)
+			self.strActionInfo.setLabel('Writing a logfile to Kodi TEMP directory')
 			self.offset += 28
 
 		if debugging:
@@ -211,6 +219,7 @@ excludes_file = xbmc.translatePath('special://profile/addon_data/script.database
 db_path = xbmc.translatePath('special://database').decode('utf-8')
 userdata_path = xbmc.translatePath('special://userdata').decode('utf-8')
 
+type_of_log =''
 is_pvr = addon.getSetting('pvr')
 autoclean = addon.getSetting('autoclean')
 bookmarks = addon.getSetting('bookmark')
@@ -223,6 +232,13 @@ specificpath = addon.getSetting('specificpath')
 backup_filename = addon.getSetting('backupname')
 forcedbname = addon.getSetting('overridedb')
 replacepath = addon.getSetting('replacepath')
+enable_logging = addon.getSetting('logtolog')
+if enable_logging == 'true':
+	enable_logging = True
+	type_of_log = addon.getSetting('typeoflog')
+	
+else:
+	enable_logging = False
 if replacepath == 'true':
 	replacepath = True
 else:
@@ -267,17 +283,41 @@ def dbglog(txt):
 	if debugging:
 		log(txt)
 		
+		
 def cleaner_log_file(our_select, cleaning):
 	cleaner_log = xbmc.translatePath('special://temp/database-cleaner.log').decode('utf-8')
 	old_cleaner_log = xbmc.translatePath('special://temp/database-cleaner.old.log').decode('utf-8')
-	if xbmcvfs.exists(cleaner_log) and cleaning:
-		dbglog('database-cleaner.log exists - renaming to old.log')
-		xbmcvfs.delete(old_cleaner_log)
-		xbmcvfs.copy(cleaner_log, old_cleaner_log)
-		xbmcvfs.delete(cleaner_log)
-	elif xbmcvfs.exists(cleaner_log) and not cleaning:
-		xbmcvfs.delete(cleaner_log)
-	logfile = xbmcvfs.File(cleaner_log, 'w')
+		
+	if not enable_logging:
+		return
+	if type_of_log == 0:
+		if cleaning:
+			if xbmcvfs.exists(cleaner_log):
+				dbglog('database-cleaner.log exists - renaming to old.log')
+				xbmcvfs.delete(old_cleaner_log)
+				xbmcvfs.copy(cleaner_log, old_cleaner_log)
+				xbmcvfs.delete(cleaner_log)
+		else:
+			xbmcvfs.delete(cleaner_log)
+	else:
+		if cleaning:
+			if xbmcvfs.exists(cleaner_log):
+				dbglog('database-cleaner.log exists - backing up to old.log')
+				xbmcvfs.delete(old_cleaner_log)
+				xbmcvfs.copy(cleaner_log, old_cleaner_log)
+		old_log= xbmcvfs.File(cleaner_log)
+		old_log_contents=old_log.read()
+		old_log.close()
+	
+	now = datetime.datetime.now()
+	logfile=xbmcvfs.File(cleaner_log, 'w')
+	if old_log_contents:
+		logfile.write(old_log_contents)
+	
+	logfile_header = 'Video Database Cleaner - Running at ' + now.strftime('%c') + '\n'
+	logfile_header = logfile_header + ' Running on ' + _platform +'\n\n'
+	logfile.write(logfile_header)
+
 	cursor.execute(our_select)
 	if not cleaning and not replacepath:
 		logfile.write('The following file paths would be removed from your database')
@@ -293,28 +333,25 @@ def cleaner_log_file(our_select, cleaning):
 		logfile.write('\n\n')
 	if not specificpath and not replacepath:
 		for strPath in cursor:
-			mystring = u'Removing unused path '.join(strPath) + '\n'
+			mystring = u''.join(strPath) + '\n'
 			outdata = mystring.encode('utf-8')
 			dbglog('Removing unused path %s' % strPath)
 			logfile.write(outdata)
 	elif specificpath and not replacepath:
-		mystring = u'Removing specific path ' + specific_path_to_remove + '\n'
-		outdata = mystring.encode('utf-8')
 		dbglog('Removing specific path %s' % specific_path_to_remove)
 		for strPath in cursor:
-			mystring = u'Removing unwanted path '.join(strPath) + '\n'
+			mystring = u''.join(strPath) + '\n'
 			outdata = mystring.encode('utf-8')
 			dbglog('Removing unwanted path %s' % strPath)
 			logfile.write(outdata)
 	else:
-		mystring = u'Changing path '+ old_path + 'to ' + new_path + '\n'
-		outdata = mystring.encode('utf-8')
 		for strPath in cursor:
-			mystring = u' changing path '.join(strPath) + '\n'
+			mystring = u''.join(strPath) + '\n'
 			outdata = mystring.encode('utf-8')
 			dbglog('Changing path %s' % strPath)
 			logfile.write(outdata)
 		our_data = cursor
+	logfile.write('\n\n')
 	logfile.close()
 	
 		
@@ -579,19 +616,20 @@ if addon:
 		if excluding:
 			my_command = my_command + exclude_command
 			our_source_list = our_source_list + 'Keeping items from excludes.xml '
-	if not specificpath and not replacepath:			
+				
 # Build SQL query	
 		if my_command:
-			sql = """DELETE FROM files WHERE idPath IN ( SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath LIKE 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%') AND (""" + my_command + """)));"""
+			sql = """DELETE FROM files WHERE idPath IN ( SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath Like 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%' OR strPath LIKE 'pvr://%') AND (""" + my_command + """)));"""
 		else:
 			sql = """DELETE FROM files WHERE idPath IN (SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath LIKE 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%')));"""
 			
-		dbglog('SQL command is %s' % sql)
-				
+	dbglog('SQL command is %s' % sql)
+	if not specificpath and not replacepath:
+		dbglog (our_source_list)			
 		our_select = sql.replace('DELETE FROM files','SELECT strPath FROM path',1)
-		if bookmarks: # bookmarks require a join to handle selecting paths 
-			our_select = sql.replace('DELETE FROM files', 'SELECT strPath FROM path FULL JOIN bookmark on idFile', 1)
-			our_select.replace(' AND idFile NOT IN (SELECT idFile FROM bookmark)', ' OR idFile NOT IN (SELECT idFile FROM bookmark)',1)
+#		if bookmarks: # bookmarks require a join to handle selecting paths 
+#			our_select = sql.replace('DELETE FROM files', 'SELECT strPath FROM path JOIN bookmark on idFile', 1)
+#			our_select.replace(' AND idFile NOT IN (SELECT idFile FROM bookmark)', ' OR idFile NOT IN (SELECT idFile FROM bookmark)',1)
 		dbglog('Select Command is %s' % our_select)
 	elif not replacepath and specificpath:		# cleaning a specific path
 		if specific_path_to_remove != '':

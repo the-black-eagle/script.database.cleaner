@@ -8,8 +8,10 @@
         <setting id="autobackup" label="32015" type="bool" default="true"/>
         <setting id="backupname" label="32016" type="text" default="" enable="eq(-1,true)"/>
         <setting id="promptdelete" label="32007" type="bool" default="true"/>
-        <setting type="sep"/>
-        <setting label="32004" type="lsep"/>
+    </category>
+		<category label="32004">
+        <setting id="logtolog" label="32025" type="bool" default="true"/>
+        <setting id="typeoflog" label="32026" type="enum" lvalues="32027|32028" default="" enabled="eq(-1,true)" visible="eq(-1,true)"/>
         <setting id="debugging" label="32005" type="bool" default="false"/>
     </category>
     <category label="32010">
