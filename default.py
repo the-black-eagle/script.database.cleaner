@@ -23,7 +23,9 @@ import xml.etree.ElementTree as ET
 
 import mysql.connector
 
-from sys import platform as _platform
+import platform
+
+import os
 
 import xbmc
 
@@ -287,10 +289,11 @@ def dbglog(txt):
 def cleaner_log_file(our_select, cleaning):
 	cleaner_log = xbmc.translatePath('special://temp/database-cleaner.log').decode('utf-8')
 	old_cleaner_log = xbmc.translatePath('special://temp/database-cleaner.old.log').decode('utf-8')
-		
+	old_log_contents =''	
 	if not enable_logging:
 		return
-	if type_of_log == 0:
+	if type_of_log == '0':
+		dbglog('Writing to new log file')
 		if cleaning:
 			if xbmcvfs.exists(cleaner_log):
 				dbglog('database-cleaner.log exists - renaming to old.log')
@@ -300,6 +303,7 @@ def cleaner_log_file(our_select, cleaning):
 		else:
 			xbmcvfs.delete(cleaner_log)
 	else:
+		dbglog('Appending to existing log file')
 		if cleaning:
 			if xbmcvfs.exists(cleaner_log):
 				dbglog('database-cleaner.log exists - backing up to old.log')
@@ -313,9 +317,11 @@ def cleaner_log_file(our_select, cleaning):
 	logfile=xbmcvfs.File(cleaner_log, 'w')
 	if old_log_contents:
 		logfile.write(old_log_contents)
-	
-	logfile_header = 'Video Database Cleaner - Running at ' + now.strftime('%c') + '\n'
-	logfile_header = logfile_header + ' Running on ' + _platform +'\n\n'
+	more_info = platform.dist()
+	more_info = str(more_info).replace("'","",20)
+	more_info = more_info.replace(",","",1)
+	running_platform = platform.system()
+	logfile_header = 'Video Database Cleaner V' + addonversion+ ' - Running on '+ str(running_platform) +' ' +  str(more_info) + ' at ' + now.strftime('%c') + '\n\n'
 	logfile.write(logfile_header)
 
 	cursor.execute(our_select)
@@ -335,7 +341,7 @@ def cleaner_log_file(our_select, cleaning):
 		for strPath in cursor:
 			mystring = u''.join(strPath) + '\n'
 			outdata = mystring.encode('utf-8')
-			dbglog('Removing unused path %s' % strPath)
+			dbglog('Removing non sources.xml path %s' % strPath)
 			logfile.write(outdata)
 	elif specificpath and not replacepath:
 		dbglog('Removing specific path %s' % specific_path_to_remove)
@@ -364,7 +370,7 @@ for num in range(114, 35, -1):
 	testname = our_dbname + str(num)
 	our_test = db_path + testname + '.db'
 
-	dbglog('Checking for database %s' % testname)
+	dbglog('Checking for local database %s' % testname)
 	if xbmcvfs.exists(our_test):
 		break
 if num != 35:
@@ -507,7 +513,7 @@ if addon:
 					pass
 			if not db.is_connected():
 				xbmcgui.Dialog().ok(addonname, "Couldn't connect to MySQL database", s)
-				dbglog("Error - couldn't connect to MySQL database	- %s " % s)
+				log("Error - couldn't connect to MySQL database	- %s " % s)
 				exit(1)
 	elif is_mysql and forcedbname:
 		try:
@@ -516,7 +522,7 @@ if addon:
 				our_dbname = forcedname
 				dbglog('Connected to forced MySQL database %s' % forcedname)
 		except:
-			dbglog('Error connecting to forced	database - %s' % forcedname)
+			log('Error connecting to forced	database - %s' % forcedname)
 			exit(1)
 	elif not is_mysql and not forcedbname:
 		try:
@@ -525,20 +531,21 @@ if addon:
 		except Exception,e:
 			s = str(e)
 			xbmcgui.Dialog().ok(addonname, 'Error connecting to SQLite database', s)
-			dbglog('Error connecting to SQLite database - %s' % s)
+			log('Error connecting to SQLite database - %s' % s)
 			exit(1)
 	else:
 		testpath = db_path + forcedname + '.db'
 		if not xbmcvfs.exists(testpath):
-			dbglog('Forced version of database does not exist')
-			xbmcgui.Dialog().ok(addonname,'Forced version of database not found. Script will now exit')
+			log('Forced version of database does not exist')
+			xbmcgui.Dialog().ok(addonname,'Error - Forced version of database ( %s ) not found. Script will now exit' % forcedname)
 			exit(1)
 		try:
 			my_db_connector = db_path + forcedname + '.db'
 			db = sqlite3.connect(my_db_connector)
 			dbglog('Connected to forced video database')
 		except:
-			dbglog('Unable to connect to forced database s%' % forcedname)
+			xbmcgui.Dialog().ok(addonname,'Error - Unable to connect to forced database %s. Script will now exit' % forcedname)
+			log('Unable to connect to forced database s%' % forcedname)
 			exit(1)
 
 	cursor = db.cursor()
@@ -562,6 +569,7 @@ if addon:
 			exit(1)
 	
 	if not no_sources:
+		# start reading sources.xml and build SQL statements to exclude these sources from any cleaning
 		try:
 			display_list =[]
 			for video in root.findall('video'):
@@ -601,6 +609,9 @@ if addon:
 		if bookmarks:
 			my_command = my_command + ' AND idFile NOT IN (SELECT idFile FROM bookmark)'
 			our_source_list = our_source_list + 'Keeping bookmarked files '
+			
+			# construct the full SQL query
+			
 		sql = \
 			"""DELETE FROM files WHERE idPath IN(SELECT idPath FROM path where (""" + my_command + """));"""
 	if no_sources:
@@ -617,8 +628,9 @@ if addon:
 			my_command = my_command + exclude_command
 			our_source_list = our_source_list + 'Keeping items from excludes.xml '
 				
-# Build SQL query	
-		if my_command:
+# Build SQL query
+	
+		if my_command: # this is SQL for no sources
 			sql = """DELETE FROM files WHERE idPath IN ( SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath Like 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%' OR strPath LIKE 'pvr://%') AND (""" + my_command + """)));"""
 		else:
 			sql = """DELETE FROM files WHERE idPath IN (SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath LIKE 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%')));"""
@@ -627,9 +639,10 @@ if addon:
 	if not specificpath and not replacepath:
 		dbglog (our_source_list)			
 		our_select = sql.replace('DELETE FROM files','SELECT strPath FROM path',1)
-#		if bookmarks: # bookmarks require a join to handle selecting paths 
-#			our_select = sql.replace('DELETE FROM files', 'SELECT strPath FROM path JOIN bookmark on idFile', 1)
-#			our_select.replace(' AND idFile NOT IN (SELECT idFile FROM bookmark)', ' OR idFile NOT IN (SELECT idFile FROM bookmark)',1)
+		if bookmarks:  # have to delete from paths table rather than files as there is a conflicting trigger on the files table
+			our_select = sql.replace('DELETE FROM files', 'SELECT strPath FROM path WHERE idPath in (SELECT idPath FROM files', 1)
+			our_select = our_select.replace('bookmark)', 'bookmark))',1)
+			sql = sql.replace('DELETE FROM files','DELETE FROM path',1)
 		dbglog('Select Command is %s' % our_select)
 	elif not replacepath and specificpath:		# cleaning a specific path
 		if specific_path_to_remove != '':
@@ -637,12 +650,14 @@ if addon:
 			our_select = "SELECT strPath FROM path WHERE idPath IN (SELECT idPath FROM path WHERE (strPath LIKE'" + specific_path_to_remove + "%'))"
 			dbglog('Select Command is %s' % our_select)
 		else:
+			xbmcgui.Dialog().ok(addonname,'Error - Specific path selected but no path defined. Script aborted')
 			dbglog("Error - Specific path selected with no path defined")
 			exit(1)
 	else: # must be replacing a path at this point
 		if old_path != '' and new_path != '':
 			our_select = "SELECT strPath from path WHERE strPath Like '" + old_path + "%'"
 		else:
+			xbmcgui.Dialog().ok(addonname,'Error - Replace path selected but one or more paths are not defined. Script aborted')
 			dbglog('Error - Missing path for replacement')
 			exit(1)
 	cleaner_log_file(our_select, False)
@@ -688,18 +703,23 @@ if addon:
 			try:
 	
 			# Execute the SQL command
-	
+				dbglog('Executing SQL command - %s' % sql)
 				cursor.execute(sql)
+				cursor.execute('DELETE FROM files WHERE strFilename ="";')
 	
 			# Commit your changes in the database
 	
 				db.commit()
-			except:
+			except Exception as e:
 	
 			# Rollback in case there is any error
 	
 				db.rollback()
 				dbglog('Error in db commit. Transaction rolled back')
+				dbglog('******************************************************************************')
+				dbglog('**  SQL ERROR  **  SQL ERROR   **  SQL ERROR  **  SQL ERROR  **  SQL ERROR  **')
+				dbglog('**   %s ' % e)
+				dbglog('******************************************************************************')
 				
 		else:
 			dbglog('Changing Paths - generating SQL statements')
