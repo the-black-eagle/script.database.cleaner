@@ -113,11 +113,15 @@ C) Replace path in database
 
 If enabled the user must specify an existing path and a new path. Any paths containing the 
 specified existing path will be renamed to the new path.  This is useful if you move a 
-directory on disk but do not want to remove and re-scan the source in Kodi. Renaming a path 
-automatically turns off once the path has been renamed.  Again, it is possible by aborting
-the add-on in the summary window to generate a logfile showing the original path and the new
-path to aid users in determining if everything is correct. Clicking on the 'Do it !!' button
-or turning off the summary window will rename the path(s) and turn this setting off.
+directory on disk but do not want to remove and re-scan the source in Kodi. The add-on
+generates the list of paths by appending a wildcard to the supplied 'old path'.  This means that
+a supplied path of 'nfs://OLD_SERVER/' will include 'nfs://OLD_SERVER/Movies/' and any other
+directories in the tree. If the new path were 'nfs://NEW_SERVER/' then every path starting with 
+'nfs://OLD_SERVER/' will become 'nfs://NEW_SERVER/' eg withe the Movies directory above, the path
+would become 'nfs://NEW_SERVER/Movies'. Renaming a path automatically turns off once the path
+has been renamed.  Again, it is possible by aborting the add-on in the summary window to generate a 
+logfile showing the original path and the new path to aid users in determining if everything is correct.
+Clicking on the 'Do it !' button or turning off the summary window will rename the path(s) and turn this setting off.
 
 USAGE
 =====
@@ -139,7 +143,9 @@ The add-on can exclude user defined paths (including plugins) from the clean.  T
 creating a file called 'excludes.xml' in the add-ons 'addon_data' directory.  This is located
 in Kodi's 'userdata' directory. Inside the addon_data directory, users should find a directory
 called 'script.database.cleaner'.  NOTE - if you have not changed any settings, this directory
-may not exist by default.  Changing one setting should ensure this directory exists.
+may not exist by default.  Changing one setting should ensure this directory exists. This file
+however does not exist by default, it must be created by the user.
+
 The format of the 'excludes.xml' file is simple. EG
 
 <excludes>
@@ -147,7 +153,7 @@ The format of the 'excludes.xml' file is simple. EG
 	<exclude>plugin://plugin.video.itunes_trailers</exclude>
 </excludes>
 
-All excludes.xml files must start with the <excludes> tag and end with </excludes>
+The excludes.xml file must start with the <excludes> tag and end with </excludes>
 Any amount of <exclude></exclude> tags can be included.
 A wildcard is appended to the contents of any <exclude> tag, so
 <exclude>plugin://</exclude> would exclude ALL plugins
@@ -162,5 +168,8 @@ for your trailers.
 
 <exclude>plugin://plugin.video.itunes_trailers/trailer/play/http%3A%2F%2Fmovietrailers.apple.com%2Fmovies%2Fdisney%2Fzootopia%2Fzootopia-tlr1_h720p.mov</exclude>
 keeps just that one trailer and deletes all the others.
+
+NOTE - It is possible to specify any  valid path or part of a path in the <exclude> tag
+This allows very fine control over what is removed or kept.
 
 
