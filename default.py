@@ -69,6 +69,9 @@ class MyClass(xbmcgui.WindowXMLDialog):
 			self.mylist.addItem('')
 			for i in range(len(self.display_list)):
 				self.mylist.addItem('[COLOR yellow]'+self.display_list[i]+'[/COLOR]')
+			if no_sources:
+				self.mylist.addItem('[COLOR red]No sources are in use[/COLOR]')
+				self.mylist.addItem('All streaming paths will be removed')
 			self.setFocus(self.mylist)
 	#		List paths in excludes.xml (if it exists)
 		
@@ -136,9 +139,9 @@ class MyClass(xbmcgui.WindowXMLDialog):
 			self.offset += 28
 
 		if debugging:
-			debug_string = 'Debugging enabled'
+			debug_string = 'Debugging [COLOR red]enabled[/COLOR]'
 		else:
-			debug_string = 'Debugging disabled'
+			debug_string = 'Debugging [COLOR green]disabled[/COLOR]'
 		self.strActionInfo = xbmcgui.ControlLabel (self.base_offset_x+900,self.base_offset_y + self.offset+260 ,550 ,100,'','font13','0xFFFFFFFF')
 		self.addControl(self.strActionInfo)
 		self.strActionInfo.setLabel(debug_string)
@@ -325,6 +328,7 @@ def cleaner_log_file(our_select, cleaning):
 	logfile.write(logfile_header)
 
 	cursor.execute(our_select)
+	counting = 0
 	if not cleaning and not replacepath:
 		logfile.write('The following file paths would be removed from your database')
 		logfile.write('\n\n')
@@ -339,6 +343,7 @@ def cleaner_log_file(our_select, cleaning):
 		logfile.write('\n\n')
 	if not specificpath and not replacepath:
 		for strPath in cursor:
+			counting +=1
 			mystring = u''.join(strPath) + '\n'
 			outdata = mystring.encode('utf-8')
 			dbglog('Removing non sources.xml path %s' % strPath)
@@ -346,17 +351,22 @@ def cleaner_log_file(our_select, cleaning):
 	elif specificpath and not replacepath:
 		dbglog('Removing specific path %s' % specific_path_to_remove)
 		for strPath in cursor:
+			counting +=1
 			mystring = u''.join(strPath) + '\n'
 			outdata = mystring.encode('utf-8')
 			dbglog('Removing unwanted path %s' % strPath)
 			logfile.write(outdata)
 	else:
 		for strPath in cursor:
+			counting +=1
 			mystring = u''.join(strPath) + '\n'
 			outdata = mystring.encode('utf-8')
 			dbglog('Changing path %s' % strPath)
 			logfile.write(outdata)
 		our_data = cursor
+	if counting == 0:  # nothing to remove
+		logfile.write('No paths have been found to remove\n')
+		
 	logfile.write('\n\n')
 	logfile.close()
 	
@@ -619,19 +629,25 @@ if addon:
 		our_source_list = 'NO SOURCES FOUND - REMOVING rtmp(e), plugin and http info '
 		dbglog('Not using sources.xml')
 		if is_pvr:
-			my_command = my_command + " AND strPath NOT LIKE 'pvr://%'"
+			my_command = my_command + "strPath NOT LIKE 'pvr://%'"
 			our_source_list = our_source_list + 'Keeping PVR info '
 		if bookmarks:
-			my_command = my_command + ' AND idFile NOT IN (SELECT idFile FROM bookmark)'
+			if my_command:
+				my_command = my_command + ' AND idFile NOT IN (SELECT idFile FROM bookmark)'
+			else: 
+				my_command = my_command + ' idFile NOT IN (SELECT idFile FROM bookmark)'
 			our_source_list = our_source_list + 'Keeping bookmarked files '
 		if excluding:
-			my_command = my_command + exclude_command
+			if my_command:
+				my_command = my_command + exclude_command
+			else:
+				my_command = my_command + exclude_command.replace('AND','',1)
 			our_source_list = our_source_list + 'Keeping items from excludes.xml '
 				
 # Build SQL query
 	
 		if my_command: # this is SQL for no sources
-			sql = """DELETE FROM files WHERE idPath IN ( SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath Like 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%' OR strPath LIKE 'pvr://%') AND (""" + my_command + """)));"""
+			sql = """DELETE FROM files WHERE idPath IN ( SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath Like 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%') AND (""" + my_command + """)));"""
 		else:
 			sql = """DELETE FROM files WHERE idPath IN (SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath LIKE 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%')));"""
 			
