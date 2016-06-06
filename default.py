@@ -11,6 +11,7 @@
 # Version 28b/3 - Tidy up temp path code, remove some unused code
 # Version 29b/1 - Add ability to rename paths inside the db
 # Version 29b/2 - Fix incorrectly altered SQL
+# Version 30/b1 - UI improvements - only allow one instance
 
 
 import datetime
@@ -401,7 +402,7 @@ else:
 	WINDOW.setProperty('database-cleaner-running', 'true')
 	
 xbmcgui.Dialog().notification(addonname, 'Starting Up', xbmcgui.NOTIFICATION_INFO, 2000)
-xbmc.sleep(1500)
+xbmc.sleep(2000)
 
 our_dbname = 'MyVideos'
 
