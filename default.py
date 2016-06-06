@@ -324,25 +324,10 @@ def cleaner_log_file(our_select, cleaning):
 	logfile=xbmcvfs.File(cleaner_log, 'w')
 	if old_log_contents:
 		logfile.write(old_log_contents)
-	
-<<<<<<< HEAD
-	running_platform = platform.system()
-	if running_platform == 'Linux':
-		more_info = platform.dist()
-		more_info = str(more_info).replace("'","",20)
-		more_info = more_info.replace(",","",1)
-	else:
-		more_info=''
-	date_long_format = xbmc.getRegion('datelong')
-	time_format = xbmc.getRegion('time')
-	date_long_format = date_long_format + ' '+time_format
-	logfile_header = 'Video Database Cleaner V' + addonversion+ ' - Running on '+ str(running_platform) +' ' +  str(more_info) + ' at ' +now.strftime(date_long_format) + '\n\n'
-=======
 	date_long_format = xbmc.getRegion('datelong')
 	time_format = xbmc.getRegion('time')
 	date_long_format = date_long_format + ' '+time_format
 	logfile_header = 'Video Database Cleaner V' + addonversion+ ' - Running at ' +now.strftime(date_long_format) + '\n\n'
->>>>>>> 81b0223343f6dbd77c3199cfb79160e5e3ba780c
 	logfile.write(logfile_header)
 
 	cursor.execute(our_select)
@@ -621,14 +606,9 @@ if addon:
 		except:
 			log('Error parsing excludes.xml')
 			xbmcgui.Dialog().ok(addonname, 'Error parsing excludes.xml file - script aborted')
-<<<<<<< HEAD
-			exit(1)
-			
-	xbmc.executebuiltin( "ActivateWindow(busydialog)" )
-=======
+
 			exit_on_error()
-			
->>>>>>> 81b0223343f6dbd77c3199cfb79160e5e3ba780c
+
 
 	if not no_sources:
 		# start reading sources.xml and build SQL statements to exclude these sources from any cleaning
@@ -730,11 +710,6 @@ if addon:
 			exit_on_error()
 	xbmc.sleep(500)
 	cleaner_log_file(our_select, False)
-<<<<<<< HEAD
-	xbmc.executebuiltin( "Dialog.Close(busydialog)" )
-=======
-	
->>>>>>> 81b0223343f6dbd77c3199cfb79160e5e3ba780c
 
 	if promptdelete:
 		mydisplay = MyClass('cleaner-window.xml', addonpath)
@@ -798,13 +773,8 @@ if addon:
 		else:
 			dbglog('Changing Paths - generating SQL statements')
 			our_select = "SELECT strPath from path WHERE strPath Like '" + old_path + "%'"
-#			xbmc.executebuiltin( "ActivateWindow(busydialog)" )
 			cursor.execute(our_select)
 			tempcount=0
-<<<<<<< HEAD
-			listsize = cursor.rowcount
-			dbglog('Cursor size is %d' % listsize)
-=======
 			listsize = len(cursor.fetchall())
 			dialog  = xbmcgui.DialogProgressBG()
 			dbglog('Creating progress dialog')
@@ -812,7 +782,6 @@ if addon:
 			dialog.update(1)
 			dbglog('Cursor size is %d' % listsize)
 			cursor.execute(our_select)
->>>>>>> 81b0223343f6dbd77c3199cfb79160e5e3ba780c
 			renamepath_list = [] 
 			for strPath in cursor:	# build a list of paths to change
 				renamepath_list.append( ''.join(strPath))
