@@ -115,13 +115,16 @@ If enabled the user must specify an existing path and a new path. Any paths cont
 specified existing path will be renamed to the new path.  This is useful if you move a 
 directory on disk but do not want to remove and re-scan the source in Kodi. The add-on
 generates the list of paths by appending a wildcard to the supplied 'old path'.  This means that
-a supplied path of 'nfs://OLD_SERVER/' will include 'nfs://OLD_SERVER/Movies/' and any other
-directories in the tree. If the new path were 'nfs://NEW_SERVER/' then every path starting with 
-'nfs://OLD_SERVER/' will become 'nfs://NEW_SERVER/' eg withe the Movies directory above, the path
+a supplied path of 'nfs://OLD_SERVER' will include 'nfs://OLD_SERVER/Movies' and any other
+directories in the tree. If the new path were 'nfs://NEW_SERVER' then every path starting with 
+'nfs://OLD_SERVER' will become 'nfs://NEW_SERVER' eg with the Movies directory above, the path
 would become 'nfs://NEW_SERVER/Movies'. Renaming a path automatically turns off once the path
 has been renamed.  Again, it is possible by aborting the add-on in the summary window to generate a 
 logfile showing the original path and the new path to aid users in determining if everything is correct.
 Clicking on the 'Do it !' button or turning off the summary window will rename the path(s) and turn this setting off.
+
+NOTE - Paths should NOT end with a terminating slash (either '\' or '/' depending on your OS) as this will lead to 
+double slashes being inserted into the database.
 
 USAGE
 =====
