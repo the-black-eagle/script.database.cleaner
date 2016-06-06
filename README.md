@@ -13,7 +13,9 @@ with a date and time stamp appended.  MySQL users need to manually back-up
 their database.
 
 Users can also choose (via the add-on settings) to retain or remove old 
-PVR information and to retain or remove bookmarks.
+PVR information and to retain or remove bookmarks.  As of V0.5.5 all the different
+settings are documented in the file **docs.txt** which is included with the add-on
+and can be found in the add-on's directory.
 
 When run, the script will prompt with a summary window containing a list
 of the paths to retain in the database. Users are encouraged to check that 
