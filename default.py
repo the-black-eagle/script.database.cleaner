@@ -10,7 +10,7 @@
 # Version 28b/2 - Fix the WINDOWS KODI temp path
 # Version 28b/3 - Tidy up temp path code, remove some unused code
 # Version 29b/1 - Add ability to rename paths inside the db
-# Version 29/b2 - Fix incorrectly altered SQL
+# Version 29b/2 - Fix incorrectly altered SQL
 
 
 import datetime
@@ -22,10 +22,6 @@ import sqlite3
 import xml.etree.ElementTree as ET
 
 import mysql.connector
-
-import platform
-
-import os
 
 import xbmc
 
@@ -288,11 +284,17 @@ def dbglog(txt):
 	if debugging:
 		log(txt)
 		
+def exit_on_error():
+	WINDOW.setProperty('database-cleaner-running', 'false')
+	exit(1)
+
+		
 		
 def cleaner_log_file(our_select, cleaning):
 	cleaner_log = xbmc.translatePath('special://temp/database-cleaner.log').decode('utf-8')
 	old_cleaner_log = xbmc.translatePath('special://temp/database-cleaner.old.log').decode('utf-8')
-	old_log_contents =''	
+	old_log_contents =''
+	do_progress = False
 	if not enable_logging:
 		return
 	if type_of_log == '0':
@@ -320,15 +322,24 @@ def cleaner_log_file(our_select, cleaning):
 	logfile=xbmcvfs.File(cleaner_log, 'w')
 	if old_log_contents:
 		logfile.write(old_log_contents)
-	more_info = platform.dist()
-	more_info = str(more_info).replace("'","",20)
-	more_info = more_info.replace(",","",1)
-	running_platform = platform.system()
-	logfile_header = 'Video Database Cleaner V' + addonversion+ ' - Running on '+ str(running_platform) +' ' +  str(more_info) + ' at ' + now.strftime('%c') + '\n\n'
+	
+	date_long_format = xbmc.getRegion('datelong')
+	time_format = xbmc.getRegion('time')
+	date_long_format = date_long_format + ' '+time_format
+	logfile_header = 'Video Database Cleaner V' + addonversion+ ' - Running at ' +now.strftime(date_long_format) + '\n\n'
 	logfile.write(logfile_header)
 
 	cursor.execute(our_select)
 	counting = 0
+	
+	listsize = len(cursor.fetchall())
+	if listsize > 600:
+		do_progress = True
+		dialog  = xbmcgui.DialogProgressBG()
+		dbglog('Creating progress dialog for logfile')
+		dialog.create('Getting required data.  Please wait')
+		dialog.update(1)
+	
 	if not cleaning and not replacepath:
 		logfile.write('The following file paths would be removed from your database')
 		logfile.write('\n\n')
@@ -346,7 +357,10 @@ def cleaner_log_file(our_select, cleaning):
 			counting +=1
 			mystring = u''.join(strPath) + '\n'
 			outdata = mystring.encode('utf-8')
-			dbglog('Removing non sources.xml path %s' % strPath)
+			if do_progress:
+				dialog.update(percent = int((counting / float(listsize)) * 100))
+			if cleaning:
+				dbglog('Removing non sources.xml path %s' % strPath)
 			logfile.write(outdata)
 	elif specificpath and not replacepath:
 		dbglog('Removing specific path %s' % specific_path_to_remove)
@@ -354,25 +368,40 @@ def cleaner_log_file(our_select, cleaning):
 			counting +=1
 			mystring = u''.join(strPath) + '\n'
 			outdata = mystring.encode('utf-8')
-			dbglog('Removing unwanted path %s' % strPath)
+			if do_progress:
+				dialog.update(percent = int((counting / float(listsize)) * 100))
+			if cleaning:
+				dbglog('Removing unwanted path %s' % strPath)
 			logfile.write(outdata)
 	else:
 		for strPath in cursor:
 			counting +=1
 			mystring = u''.join(strPath) + '\n'
 			outdata = mystring.encode('utf-8')
-			dbglog('Changing path %s' % strPath)
+			if do_progress:
+				dialog.update(percent = int((counting / float(listsize)) * 100))
+			if cleaning:
+				dbglog('Changing path %s' % strPath)
 			logfile.write(outdata)
 		our_data = cursor
 	if counting == 0:  # nothing to remove
 		logfile.write('No paths have been found to remove\n')
-		
+	if do_progress:
+		dialog.close()	
 	logfile.write('\n\n')
 	logfile.close()
 	
 		
 		
 dbglog('script version %s started' % addonversion)
+if WINDOW.getProperty('database-cleaner-running') == 'true':
+	log('Video Database Cleaner already running')
+	exit(0)
+else:
+	WINDOW.setProperty('database-cleaner-running', 'true')
+	
+xbmcgui.Dialog().notification(addonname, 'Starting Up', xbmcgui.NOTIFICATION_INFO, 2000)
+xbmc.sleep(1500)
 
 our_dbname = 'MyVideos'
 
@@ -469,7 +498,7 @@ if addon:
 		except:
 			log('Error parsing local sources.xml file')
 			xbmcgui.Dialog().ok(addonname, 'Error parsing local sources.xml file - script aborted')
-			exit(1)
+			exit_on_error()
 	elif xbmcvfs.exists(sources_file):
 		try:
 			f = xbmcvfs.File(sources_file)
@@ -480,12 +509,12 @@ if addon:
 		except:
 			log('Error parsing remote sources.xml')
 			xbmcgui.Dialog().ok(addonname, 'Error parsing remote sources.xml file - script aborted')
-			exit(1)
+			exit_on_error()
 	else:
 		xbmcgui.Dialog().ok(addonname,
 							'Error - No sources.xml file found.  Please set the path to the remote sources.xml in the addon settings')
 		dbglog('No local sources.xml, no path to remote sources file set in settings')
-		exit(1)
+		exit_on_error()
 	my_command = ''
 	first_time = True
 	if forcedbname:
@@ -524,7 +553,7 @@ if addon:
 			if not db.is_connected():
 				xbmcgui.Dialog().ok(addonname, "Couldn't connect to MySQL database", s)
 				log("Error - couldn't connect to MySQL database	- %s " % s)
-				exit(1)
+				exit_on_error()
 	elif is_mysql and forcedbname:
 		try:
 			db = mysql.connector.connect(user=our_username, database=forcedname, password=our_password, host=our_host)
@@ -533,7 +562,7 @@ if addon:
 				dbglog('Connected to forced MySQL database %s' % forcedname)
 		except:
 			log('Error connecting to forced	database - %s' % forcedname)
-			exit(1)
+			exit_on_error()
 	elif not is_mysql and not forcedbname:
 		try:
 			my_db_connector = db_path + our_dbname + '.db'
@@ -542,13 +571,13 @@ if addon:
 			s = str(e)
 			xbmcgui.Dialog().ok(addonname, 'Error connecting to SQLite database', s)
 			log('Error connecting to SQLite database - %s' % s)
-			exit(1)
+			exit_on_error()
 	else:
 		testpath = db_path + forcedname + '.db'
 		if not xbmcvfs.exists(testpath):
 			log('Forced version of database does not exist')
 			xbmcgui.Dialog().ok(addonname,'Error - Forced version of database ( %s ) not found. Script will now exit' % forcedname)
-			exit(1)
+			exit_on_error()
 		try:
 			my_db_connector = db_path + forcedname + '.db'
 			db = sqlite3.connect(my_db_connector)
@@ -556,7 +585,7 @@ if addon:
 		except:
 			xbmcgui.Dialog().ok(addonname,'Error - Unable to connect to forced database %s. Script will now exit' % forcedname)
 			log('Unable to connect to forced database s%' % forcedname)
-			exit(1)
+			exit_on_error()
 
 	cursor = db.cursor()
 	
@@ -576,8 +605,9 @@ if addon:
 		except:
 			log('Error parsing excludes.xml')
 			xbmcgui.Dialog().ok(addonname, 'Error parsing excludes.xml file - script aborted')
-			exit(1)
-	
+			exit_on_error()
+			
+
 	if not no_sources:
 		# start reading sources.xml and build SQL statements to exclude these sources from any cleaning
 		try:
@@ -608,7 +638,7 @@ if addon:
 		except:
 			log('Error parsing sources.xml file')
 			xbmcgui.Dialog().ok(addonname, 'Error parsing sources.xml file - script aborted')
-			exit(1)
+			exit_on_error()
 
 		if is_pvr:
 			my_command = my_command + " AND strPath NOT LIKE 'pvr://%'"
@@ -668,16 +698,18 @@ if addon:
 		else:
 			xbmcgui.Dialog().ok(addonname,'Error - Specific path selected but no path defined. Script aborted')
 			dbglog("Error - Specific path selected with no path defined")
-			exit(1)
+			exit_on_error()
 	else: # must be replacing a path at this point
 		if old_path != '' and new_path != '':
 			our_select = "SELECT strPath from path WHERE strPath Like '" + old_path + "%'"
 		else:
 			xbmcgui.Dialog().ok(addonname,'Error - Replace path selected but one or more paths are not defined. Script aborted')
 			dbglog('Error - Missing path for replacement')
-			exit(1)
+			exit_on_error()
+	xbmc.sleep(500)
 	cleaner_log_file(our_select, False)
-		
+	
+
 	if promptdelete:
 		mydisplay = MyClass('cleaner-window.xml', addonpath)
 		mydisplay.doModal()
@@ -740,18 +772,28 @@ if addon:
 		else:
 			dbglog('Changing Paths - generating SQL statements')
 			our_select = "SELECT strPath from path WHERE strPath Like '" + old_path + "%'"
-			xbmc.executebuiltin( "ActivateWindow(busydialog)" )
+#			xbmc.executebuiltin( "ActivateWindow(busydialog)" )
 			cursor.execute(our_select)
 			tempcount=0
+			listsize = len(cursor.fetchall())
+			dialog  = xbmcgui.DialogProgressBG()
+			dbglog('Creating progress dialog')
+			dialog.create('Replacing paths in database.  Please wait')
+			dialog.update(1)
+			dbglog('Cursor size is %d' % listsize)
+			cursor.execute(our_select)
 			renamepath_list = [] 
 			for strPath in cursor:	# build a list of paths to change
 				renamepath_list.append( ''.join(strPath))
-				tempcount += 1
+				
 				
 			for i in range(len(renamepath_list)):
+				tempcount += 1
 				our_old_path = renamepath_list[i]
 				our_new_path = our_old_path.replace(old_path, new_path,1)
 				sql = 'UPDATE path SET strPath ="' + our_new_path + '" WHERE strPath LIKE "' +our_old_path + '"'
+				dialog.update(percent = int((tempcount / float(listsize)) * 100))
+				dbglog('Percentage done %d' % int((tempcount / float(listsize)) * 100))
 				dbglog('SQL - %s' % sql)
 				try:
 					cursor.execute(sql)
@@ -761,7 +803,10 @@ if addon:
 					dbglog('Error in db commit %s. Transaction rolled back' % e)
 	
 		# disconnect from server
-		xbmc.executebuiltin( "Dialog.Close(busydialog)" )
+#		xbmc.executebuiltin( "Dialog.Close(busydialog)" )
+		xbmc.sleep(1000)
+		dbglog('Closing progress dialog')
+		dialog.close()
 		db.close()
 		
 		# Make sure replacing or changing a path is a one-shot deal
@@ -789,7 +834,11 @@ if addon:
 								'Script finished.  You should run clean library for best results'
 								)
 		dbglog('Script finished')
+		
 	else:
 		xbmcgui.Dialog().notification(addonname, 'Script aborted - No changes made', xbmcgui.NOTIFICATION_INFO, 3000)
 		dbglog('script aborted by user - no changes made')
+		WINDOW.setProperty('database-cleaner-running', 'false')
+
 		exit(1)
+	WINDOW.setProperty('database-cleaner-running', 'false')
