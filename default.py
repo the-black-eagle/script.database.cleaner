@@ -10,7 +10,7 @@
 # Version 28b/2 - Fix the WINDOWS KODI temp path
 # Version 28b/3 - Tidy up temp path code, remove some unused code
 # Version 29b/1 - Add ability to rename paths inside the db
-# Version 29/b2 - Fix incorrectly altered SQL
+# Version 29b/2 - Fix incorrectly altered SQL
 
 
 import datetime
@@ -320,11 +320,18 @@ def cleaner_log_file(our_select, cleaning):
 	logfile=xbmcvfs.File(cleaner_log, 'w')
 	if old_log_contents:
 		logfile.write(old_log_contents)
-	more_info = platform.dist()
-	more_info = str(more_info).replace("'","",20)
-	more_info = more_info.replace(",","",1)
+	
 	running_platform = platform.system()
-	logfile_header = 'Video Database Cleaner V' + addonversion+ ' - Running on '+ str(running_platform) +' ' +  str(more_info) + ' at ' + now.strftime('%c') + '\n\n'
+	if running_platform == 'Linux':
+		more_info = platform.dist()
+		more_info = str(more_info).replace("'","",20)
+		more_info = more_info.replace(",","",1)
+	else:
+		more_info=''
+	date_long_format = xbmc.getRegion('datelong')
+	time_format = xbmc.getRegion('time')
+	date_long_format = date_long_format + ' '+time_format
+	logfile_header = 'Video Database Cleaner V' + addonversion+ ' - Running on '+ str(running_platform) +' ' +  str(more_info) + ' at ' +now.strftime(date_long_format) + '\n\n'
 	logfile.write(logfile_header)
 
 	cursor.execute(our_select)
@@ -577,7 +584,9 @@ if addon:
 			log('Error parsing excludes.xml')
 			xbmcgui.Dialog().ok(addonname, 'Error parsing excludes.xml file - script aborted')
 			exit(1)
-	
+			
+	xbmc.executebuiltin( "ActivateWindow(busydialog)" )
+
 	if not no_sources:
 		# start reading sources.xml and build SQL statements to exclude these sources from any cleaning
 		try:
@@ -677,7 +686,8 @@ if addon:
 			dbglog('Error - Missing path for replacement')
 			exit(1)
 	cleaner_log_file(our_select, False)
-		
+	xbmc.executebuiltin( "Dialog.Close(busydialog)" )
+
 	if promptdelete:
 		mydisplay = MyClass('cleaner-window.xml', addonpath)
 		mydisplay.doModal()
@@ -743,6 +753,8 @@ if addon:
 			xbmc.executebuiltin( "ActivateWindow(busydialog)" )
 			cursor.execute(our_select)
 			tempcount=0
+			listsize = cursor.rowcount
+			dbglog('Cursor size is %d' % listsize)
 			renamepath_list = [] 
 			for strPath in cursor:	# build a list of paths to change
 				renamepath_list.append( ''.join(strPath))
