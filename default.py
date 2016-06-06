@@ -11,10 +11,8 @@
 # Version 28b/3 - Tidy up temp path code, remove some unused code
 # Version 29b/1 - Add ability to rename paths inside the db
 # Version 29b/2 - Fix incorrectly altered SQL
-<<<<<<< HEAD
-=======
 # Version 30/b1 - UI improvements - only allow one instance
->>>>>>> 81b0223343f6dbd77c3199cfb79160e5e3ba780c
+
 
 
 import datetime
