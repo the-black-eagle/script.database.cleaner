@@ -418,7 +418,6 @@ if num != 35:
 
 if our_dbname == 'MyVideos':
 	dbglog('No video database found - assuming MySQL database')
-log('database name is %s' % our_dbname)
 dbglog('Database name is %s' % our_dbname)
 
 if is_pvr == 'true':
@@ -497,7 +496,7 @@ if addon:
 			root = tree.getroot()
 			dbglog('Got local sources.xml file')
 		except:
-			log('Error parsing local sources.xml file')
+			dbglog('Error parsing local sources.xml file')
 			xbmcgui.Dialog().ok(addonname, 'Error parsing local sources.xml file - script aborted')
 			exit_on_error()
 	elif xbmcvfs.exists(sources_file):
@@ -508,14 +507,15 @@ if addon:
 			root = ET.fromstring(source_file)
 			dbglog('Got remote sources.xml')
 		except:
-			log('Error parsing remote sources.xml')
+			dbglog('Error parsing remote sources.xml')
 			xbmcgui.Dialog().ok(addonname, 'Error parsing remote sources.xml file - script aborted')
 			exit_on_error()
 	else:
-		xbmcgui.Dialog().ok(addonname,
-							'Error - No sources.xml file found.  Please set the path to the remote sources.xml in the addon settings')
-		dbglog('No local sources.xml, no path to remote sources file set in settings')
-		exit_on_error()
+		xbmcgui.Dialog().notification(addonname,
+							'Warning - no sources.xml file found - defaulting to cleaning streaming paths only',xbmcgui.NOTIFICATION_INFO,3000)
+		dbglog('No local sources.xml, no remote sources file set in settings')
+		xbmc.sleep(3000)
+		no_sources = True
 	my_command = ''
 	first_time = True
 	if forcedbname:
@@ -589,7 +589,7 @@ if addon:
 			exit_on_error()
 
 	cursor = db.cursor()
-	
+
 	if xbmcvfs.exists(excludes_file):
 		excludes_list =[]
 		excluding = True
@@ -606,9 +606,7 @@ if addon:
 		except:
 			log('Error parsing excludes.xml')
 			xbmcgui.Dialog().ok(addonname, 'Error parsing excludes.xml file - script aborted')
-
 			exit_on_error()
-
 
 	if not no_sources:
 		# start reading sources.xml and build SQL statements to exclude these sources from any cleaning
