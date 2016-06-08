@@ -35,8 +35,8 @@
 				<left>685</left>
 				<top>15</top>
 				<width>350</width>
-				<height>35</height>
-				<texture>window-title.png</texture>
+				<height>55</height>
+				<texture>summary-title.png</texture>
 			</control>
 		</control>	
 	</controls>

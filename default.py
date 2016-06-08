@@ -395,7 +395,7 @@ def cleaner_log_file(our_select, cleaning):
 		
 		
 dbglog('script version %s started' % addonversion)
-if WINDOW.getProperty('database-cleaner-running') == 'true':
+if WINDOW.getProperty('database-cleaner-running') == 'true' and not debugging:  # <- remove this last bit for release !!
 	log('Video Database Cleaner already running')
 	exit(0)
 else:
@@ -404,21 +404,56 @@ else:
 xbmcgui.Dialog().notification(addonname, 'Starting Up', xbmcgui.NOTIFICATION_INFO, 2000)
 xbmc.sleep(2000)
 
-our_dbname = 'MyVideos'
+if xbmcvfs.exists(advanced_file):
+	dbglog('Found advancedsettings.xml')
+	found = True
 
-for num in range(114, 35, -1):
-	testname = our_dbname + str(num)
-	our_test = db_path + testname + '.db'
+if found:
+	msg = advanced_file.encode('utf-8')
+	dbglog('looking in advancedsettings for videodatabase info')
+	advancedsettings = ET.parse(advanced_file)
+	root = advancedsettings.getroot()
+	try:
+		for videodb in root.findall('videodatabase'):
+			try:
+				our_host = videodb.find('host').text
+			except:
+				log('Unable to find MySQL host address')
+			try:
+				our_username = videodb.find('user').text
+			except:
+				log('Unable to determine MySQL username')
+			try:
+				our_password = videodb.find('pass').text
+			except:
+				log('Unable to determine MySQL password')
+			try:
+				our_dbname = videodb.find('name').text
+			except:
+				our_dbname = 'MyVideos'
+			dbglog('MySQL details - %s, %s, %s' % (our_host, our_username, our_dbname))
+			is_mysql = True
+	except Exception as e:
+		e =str(e)
+		dbglog ('Error parsing advancedsettings file - %s' % e)
+		is_mysql = False
 
-	dbglog('Checking for local database %s' % testname)
-	if xbmcvfs.exists(our_test):
-		break
-if num != 35:
-	our_dbname = testname
+if not is_mysql:
+	our_dbname = 'MyVideos'
 
-if our_dbname == 'MyVideos':
-	dbglog('No video database found - assuming MySQL database')
-dbglog('Database name is %s' % our_dbname)
+	for num in range(114, 35, -1):
+		testname = our_dbname + str(num)
+		our_test = db_path + testname + '.db'
+
+		dbglog('Checking for local database %s' % testname)
+		if xbmcvfs.exists(our_test):
+			break
+	if num != 35:
+		our_dbname = testname
+
+	if our_dbname == 'MyVideos':
+		dbglog('No video database found - assuming MySQL database')
+	dbglog('Database name is %s' % our_dbname)
 
 if is_pvr == 'true':
 	is_pvr = True
@@ -454,389 +489,360 @@ if promptdelete:
 if no_sources:
 	dbglog('Not using sources.xml')
 
-if xbmcvfs.exists(advanced_file):
-	found = True
-if addon:
-	if found:
-		msg = advanced_file.encode('utf-8')
-		advancedsettings = ET.parse(advanced_file)
-		root = advancedsettings.getroot()
-		try:
-			for videodb in root.findall('videodatabase'):
-				try:
-					our_host = videodb.find('host').text
-				except:
-					log('Unable to find MySQL host address')
-				try:
-					our_username = videodb.find('user').text
-				except:
-					log('Unable to determine MySQL username')
-				try:
-					our_password = videodb.find('pass').text
-				except:
-					log('Unable to determine MySQL password')
-				try:
-					our_dbname = videodb.find('name').text
-				except:
-					pass
-				dbglog('MySQL details - %s, %s, %s' % (our_host, our_username, our_dbname))
-				is_mysql = True
-		except:
-			is_mysql = False
 
 	
-	if source_file_path != '':
-		sources_file = source_file_path
-		remote_file = True
-		dbglog('Remote sources.xml file path identified')
-	if xbmcvfs.exists(sources_file) and not remote_file:
-		try:
-			source_file = sources_file
-			tree = ET.parse(source_file)
-			root = tree.getroot()
-			dbglog('Got local sources.xml file')
-		except:
-			dbglog('Error parsing local sources.xml file')
-			xbmcgui.Dialog().ok(addonname, 'Error parsing local sources.xml file - script aborted')
-			exit_on_error()
-	elif xbmcvfs.exists(sources_file):
-		try:
-			f = xbmcvfs.File(sources_file)
-			source_file = f.read()
-			f.close()
-			root = ET.fromstring(source_file)
-			dbglog('Got remote sources.xml')
-		except:
-			dbglog('Error parsing remote sources.xml')
-			xbmcgui.Dialog().ok(addonname, 'Error parsing remote sources.xml file - script aborted')
-			exit_on_error()
-	else:
-		xbmcgui.Dialog().notification(addonname,
-							'Warning - no sources.xml file found - defaulting to cleaning streaming paths only',xbmcgui.NOTIFICATION_INFO,3000)
-		dbglog('No local sources.xml, no remote sources file set in settings')
-		xbmc.sleep(3000)
-		no_sources = True
-	my_command = ''
-	first_time = True
-	if forcedbname:
-		log('Forcing video db version to %s' % forcedname)
+if source_file_path != '':
+	sources_file = source_file_path
+	remote_file = True
+	dbglog('Remote sources.xml file path identified')
+if xbmcvfs.exists(sources_file) and not remote_file:
+	try:
+		source_file = sources_file
+		tree = ET.parse(source_file)
+		root = tree.getroot()
+		dbglog('Got local sources.xml file')
+	except:
+		dbglog('Error parsing local sources.xml file')
+		xbmcgui.Dialog().ok(addonname, 'Error parsing local sources.xml file - script aborted')
+		exit_on_error()
+elif xbmcvfs.exists(sources_file):
+	try:
+		f = xbmcvfs.File(sources_file)
+		source_file = f.read()
+		f.close()
+		root = ET.fromstring(source_file)
+		dbglog('Got remote sources.xml')
+	except:
+		dbglog('Error parsing remote sources.xml')
+		xbmcgui.Dialog().ok(addonname, 'Error parsing remote sources.xml file - script aborted')
+		exit_on_error()
+else:
+	xbmcgui.Dialog().notification(addonname,
+						'Warning - no sources.xml file found - defaulting to cleaning streaming paths only',xbmcgui.NOTIFICATION_INFO,3000)
+	dbglog('No local sources.xml, no remote sources file set in settings')
+	xbmc.sleep(3000)
+	no_sources = True
+my_command = ''
+first_time = True
+if forcedbname:
+	log('Forcing video db version to %s' % forcedname)
 
-	# Open database connection
+# Open database connection
 
-	if is_mysql and not forcedbname:
-		if our_dbname == testname: # found an sqlite database, but no db name in advancedsettings
-			our_dbname = 'MyVideos'
-			for num in range(114, 35, -1):
-				testname = our_dbname + str(num)
-				try:
-					dbglog('Attempting MySQL connection to %s' % testname)
-					db = mysql.connector.connect(user=our_username,
-							database=testname, password=our_password,
-							host=our_host)
-					if db.is_connected():
-						our_dbname = testname
-						dbglog('Connected to MySQL database %s' % our_dbname)
-						break
-				except:
-					pass
-		else: 
-			for num in range(114, 35, -1):
-				testname = our_dbname + str(num)
-				try:
-					dbglog('Attempting MySQL connection to %s' % testname)
-					db = mysql.connector.connect(user=our_username, database=testname, password=our_password, host=our_host)
-					if db.is_connected():
-						our_dbname = testname
-						dbglog('Connected to MySQL database %s' % our_dbname)
-						break
-				except:
-					pass
-			if not db.is_connected():
-				xbmcgui.Dialog().ok(addonname, "Couldn't connect to MySQL database", s)
-				log("Error - couldn't connect to MySQL database	- %s " % s)
-				exit_on_error()
-	elif is_mysql and forcedbname:
-		try:
-			db = mysql.connector.connect(user=our_username, database=forcedname, password=our_password, host=our_host)
-			if db.is_connected():
-				our_dbname = forcedname
-				dbglog('Connected to forced MySQL database %s' % forcedname)
-		except:
-			log('Error connecting to forced	database - %s' % forcedname)
-			exit_on_error()
-	elif not is_mysql and not forcedbname:
-		try:
-			my_db_connector = db_path + our_dbname + '.db'
-			db = sqlite3.connect(my_db_connector)
-		except Exception,e:
-			s = str(e)
-			xbmcgui.Dialog().ok(addonname, 'Error connecting to SQLite database', s)
-			log('Error connecting to SQLite database - %s' % s)
-			exit_on_error()
-	else:
-		testpath = db_path + forcedname + '.db'
-		if not xbmcvfs.exists(testpath):
-			log('Forced version of database does not exist')
-			xbmcgui.Dialog().ok(addonname,'Error - Forced version of database ( %s ) not found. Script will now exit' % forcedname)
-			exit_on_error()
-		try:
-			my_db_connector = db_path + forcedname + '.db'
-			db = sqlite3.connect(my_db_connector)
-			dbglog('Connected to forced video database')
-		except:
-			xbmcgui.Dialog().ok(addonname,'Error - Unable to connect to forced database %s. Script will now exit' % forcedname)
-			log('Unable to connect to forced database s%' % forcedname)
-			exit_on_error()
-
-	cursor = db.cursor()
-
-	if xbmcvfs.exists(excludes_file):
-		excludes_list =[]
-		excluding = True
-		exclude_command = ''
-		try:
-			tree = ET.parse(excludes_file)
-			er = tree.getroot()
-			for excludes in er.findall('exclude'):
-				to_exclude = excludes.text
-				excludes_list.append(to_exclude)
-				dbglog('Excluding plugin path - %s' % to_exclude)
-				exclude_command = exclude_command + " AND strPath NOT LIKE '" + to_exclude + "%'"
-			log('Parsed excludes.xml')
-		except:
-			log('Error parsing excludes.xml')
-			xbmcgui.Dialog().ok(addonname, 'Error parsing excludes.xml file - script aborted')
-			exit_on_error()
-
-	if not no_sources:
-		# start reading sources.xml and build SQL statements to exclude these sources from any cleaning
-		try:
-			display_list =[]
-			for video in root.findall('video'):
-				dbglog('Contents of sources.xml file')
-	
-				for sources in video.findall('source'):
-					for path_name in sources.findall('name'):
-						the_path_name = path_name.text
-						for paths in sources.findall('path'):
-							the_path = paths.text
-							display_list.append(the_path)
-							dbglog('%s - %s' % (the_path_name, the_path))
-							if first_time:
-								first_time = False
-								my_command = "strPath NOT LIKE '" + the_path + "%'"
-								our_source_list = 'Keeping files in ' + the_path
-							else:
-								my_command = my_command + " AND strPath NOT LIKE '" + the_path + "%'"
-								our_source_list = our_source_list + ', ' + the_path
-				if path_name == '':
-					no_sources = True
-					dbglog('******* WARNING *******')
-					dbglog('local sources.xml specified in settings')
-					dbglog('But no sources found in sources.xml file')
-					dbglog('Defaulting to alternate method for cleaning')
-		except:
-			log('Error parsing sources.xml file')
-			xbmcgui.Dialog().ok(addonname, 'Error parsing sources.xml file - script aborted')
-			exit_on_error()
-
-		if is_pvr:
-			my_command = my_command + " AND strPath NOT LIKE 'pvr://%'"
-			our_source_list = our_source_list + 'Keeping PVR info '
-		if excluding:
-			my_command = my_command + exclude_command
-			our_source_list = our_source_list + 'Keeping items from excludes.xml '
-		if bookmarks:
-			my_command = my_command + ' AND idFile NOT IN (SELECT idFile FROM bookmark)'
-			our_source_list = our_source_list + 'Keeping bookmarked files '
-			
-			# construct the full SQL query
-			
-		sql = \
-			"""DELETE FROM files WHERE idPath IN(SELECT idPath FROM path where (""" + my_command + """));"""
-	if no_sources:
-		my_command = ''
-		our_source_list = 'NO SOURCES FOUND - REMOVING rtmp(e), plugin and http info '
-		dbglog('Not using sources.xml')
-		if is_pvr:
-			my_command = my_command + "strPath NOT LIKE 'pvr://%'"
-			our_source_list = our_source_list + 'Keeping PVR info '
-		if bookmarks:
-			if my_command:
-				my_command = my_command + ' AND idFile NOT IN (SELECT idFile FROM bookmark)'
-			else: 
-				my_command = my_command + ' idFile NOT IN (SELECT idFile FROM bookmark)'
-			our_source_list = our_source_list + 'Keeping bookmarked files '
-		if excluding:
-			if my_command:
-				my_command = my_command + exclude_command
-			else:
-				my_command = my_command + exclude_command.replace('AND','',1)
-			our_source_list = our_source_list + 'Keeping items from excludes.xml '
-				
-# Build SQL query
-	
-		if my_command: # this is SQL for no sources
-			sql = """DELETE FROM files WHERE idPath IN ( SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath Like 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%') AND (""" + my_command + """)));"""
-		else:
-			sql = """DELETE FROM files WHERE idPath IN (SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath LIKE 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%')));"""
-			
-	dbglog('SQL command is %s' % sql)
-	if not specificpath and not replacepath:
-		dbglog (our_source_list)			
-		our_select = sql.replace('DELETE FROM files','SELECT strPath FROM path',1)
-		if bookmarks:  # have to delete from paths table rather than files as there is a conflicting trigger on the files table
-			our_select = sql.replace('DELETE FROM files', 'SELECT strPath FROM path WHERE idPath in (SELECT idPath FROM files', 1)
-			our_select = our_select.replace('bookmark)', 'bookmark))',1)
-			sql = sql.replace('DELETE FROM files','DELETE FROM path',1)
-		dbglog('Select Command is %s' % our_select)
-	elif not replacepath and specificpath:		# cleaning a specific path
-		if specific_path_to_remove != '':
-			sql = """delete from path where idPath in(select * from (SELECT idPath FROM path WHERE (strPath LIKE '""" + specific_path_to_remove +"""%')) as temptable)"""
-			our_select = "SELECT strPath FROM path WHERE idPath IN (SELECT idPath FROM path WHERE (strPath LIKE'" + specific_path_to_remove + "%'))"
-			dbglog('Select Command is %s' % our_select)
-		else:
-			xbmcgui.Dialog().ok(addonname,'Error - Specific path selected but no path defined. Script aborted')
-			dbglog("Error - Specific path selected with no path defined")
-			exit_on_error()
-	else: # must be replacing a path at this point
-		if old_path != '' and new_path != '':
-			our_select = "SELECT strPath from path WHERE strPath Like '" + old_path + "%'"
-		else:
-			xbmcgui.Dialog().ok(addonname,'Error - Replace path selected but one or more paths are not defined. Script aborted')
-			dbglog('Error - Missing path for replacement')
-			exit_on_error()
-	xbmc.sleep(500)
-	cleaner_log_file(our_select, False)
-
-	if promptdelete:
-		mydisplay = MyClass('cleaner-window.xml', addonpath)
-		mydisplay.doModal()
-		del mydisplay
-		if flag == 1:
-			i = True
-		else:
-			i = False
-
-	else:
-		i = True
-	if i:
-		if autobackup == 'true' and not is_mysql:
-			backup_path = xbmc.translatePath('special://database/backups/'
-				).decode('utf-8')
-
-			if not xbmcvfs.exists(backup_path):
-				dbglog('Creating backup path %s' % backup_path)
-				xbmcvfs.mkdir(backup_path)
-			now = datetime.datetime.now()
-			if forcedbname:
-				our_dbname = forcedname
-			current_db = db_path + our_dbname + '.db'
-			if backup_filename == '':
-				backup_filename = our_dbname
-			backup_db = backup_path + backup_filename + '_' \
-				+ now.strftime('%Y-%m-%d_%H%M') + '.db'
-			backup_filename = backup_filename + '_' \
-				+ now.strftime('%Y-%m-%d_%H%M')
-			success = xbmcvfs.copy(current_db, backup_db)
-			if success == 1:
-				success = 'successful'
-			else:
-				success = 'failed'
-			dbglog('auto backup database %s.db to %s.db - result was %s'
-				% (our_dbname, backup_filename, success))
-		cleaner_log_file(our_select, True)
-		if not replacepath:
+if is_mysql and not forcedbname:
+	if our_dbname == '': # no db name in advancedsettings
+		our_dbname = 'MyVideos'
+		for num in range(114, 35, -1):
+			testname = our_dbname + str(num)
 			try:
-	
-			# Execute the SQL command
-				dbglog('Executing SQL command - %s' % sql)
+				dbglog('Attempting MySQL connection to %s' % testname)
+				db = mysql.connector.connect(user=our_username,
+						database=testname, password=our_password,
+						host=our_host)
+				if db.is_connected():
+					our_dbname = testname
+					dbglog('Connected to MySQL database %s' % our_dbname)
+					break
+			except:
+				pass
+	else: 		# already got db name from ad settings
+		for num in range(114, 35, -1):
+			testname = our_dbname + str(num)
+			try:
+				dbglog('Attempting MySQL connection to %s' % testname)
+				db = mysql.connector.connect(user=our_username, database=testname, password=our_password, host=our_host)
+				if db.is_connected():
+					our_dbname = testname
+					dbglog('Connected to MySQL database %s' % our_dbname)
+					break
+			except:
+				pass
+	if not db.is_connected():
+		xbmcgui.Dialog().ok(addonname, "Couldn't connect to MySQL database", s)
+		log("Error - couldn't connect to MySQL database	- %s " % s)
+		exit_on_error()
+elif is_mysql and forcedbname:
+	try:
+		db = mysql.connector.connect(user=our_username, database=forcedname, password=our_password, host=our_host)
+		if db.is_connected():
+			our_dbname = forcedname
+			dbglog('Connected to forced MySQL database %s' % forcedname)
+	except:
+		log('Error connecting to forced	database - %s' % forcedname)
+		exit_on_error()
+elif not is_mysql and not forcedbname:
+	try:
+		my_db_connector = db_path + our_dbname + '.db'
+		db = sqlite3.connect(my_db_connector)
+	except Exception,e:
+		s = str(e)
+		xbmcgui.Dialog().ok(addonname, 'Error connecting to SQLite database', s)
+		log('Error connecting to SQLite database - %s' % s)
+		exit_on_error()
+else:
+	testpath = db_path + forcedname + '.db'
+	if not xbmcvfs.exists(testpath):
+		log('Forced version of database does not exist')
+		xbmcgui.Dialog().ok(addonname,'Error - Forced version of database ( %s ) not found. Script will now exit' % forcedname)
+		exit_on_error()
+	try:
+		my_db_connector = db_path + forcedname + '.db'
+		db = sqlite3.connect(my_db_connector)
+		dbglog('Connected to forced video database')
+	except:
+		xbmcgui.Dialog().ok(addonname,'Error - Unable to connect to forced database %s. Script will now exit' % forcedname)
+		log('Unable to connect to forced database s%' % forcedname)
+		exit_on_error()
+
+cursor = db.cursor()
+
+if xbmcvfs.exists(excludes_file):
+	excludes_list =[]
+	excluding = True
+	exclude_command = ''
+	try:
+		tree = ET.parse(excludes_file)
+		er = tree.getroot()
+		for excludes in er.findall('exclude'):
+			to_exclude = excludes.text
+			excludes_list.append(to_exclude)
+			dbglog('Excluding plugin path - %s' % to_exclude)
+			exclude_command = exclude_command + " AND strPath NOT LIKE '" + to_exclude + "%'"
+		log('Parsed excludes.xml')
+	except:
+		log('Error parsing excludes.xml')
+		xbmcgui.Dialog().ok(addonname, 'Error parsing excludes.xml file - script aborted')
+		exit_on_error()
+
+if not no_sources:
+	# start reading sources.xml and build SQL statements to exclude these sources from any cleaning
+	try:
+		display_list =[]
+		for video in root.findall('video'):
+			dbglog('Contents of sources.xml file')
+
+			for sources in video.findall('source'):
+				for path_name in sources.findall('name'):
+					the_path_name = path_name.text
+					for paths in sources.findall('path'):
+						the_path = paths.text
+						display_list.append(the_path)
+						dbglog('%s - %s' % (the_path_name, the_path))
+						if first_time:
+							first_time = False
+							my_command = "strPath NOT LIKE '" + the_path + "%'"
+							our_source_list = 'Keeping files in ' + the_path
+						else:
+							my_command = my_command + " AND strPath NOT LIKE '" + the_path + "%'"
+							our_source_list = our_source_list + ', ' + the_path
+			if path_name == '':
+				no_sources = True
+				dbglog('******* WARNING *******')
+				dbglog('local sources.xml specified in settings')
+				dbglog('But no sources found in sources.xml file')
+				dbglog('Defaulting to alternate method for cleaning')
+	except:
+		log('Error parsing sources.xml file')
+		xbmcgui.Dialog().ok(addonname, 'Error parsing sources.xml file - script aborted')
+		exit_on_error()
+
+	if is_pvr:
+		my_command = my_command + " AND strPath NOT LIKE 'pvr://%'"
+		our_source_list = our_source_list + 'Keeping PVR info '
+	if excluding:
+		my_command = my_command + exclude_command
+		our_source_list = our_source_list + 'Keeping items from excludes.xml '
+	if bookmarks:
+		my_command = my_command + ' AND idFile NOT IN (SELECT idFile FROM bookmark)'
+		our_source_list = our_source_list + 'Keeping bookmarked files '
+		
+		# construct the full SQL query
+		
+	sql = \
+		"""DELETE FROM files WHERE idPath IN(SELECT idPath FROM path where (""" + my_command + """));"""
+if no_sources:
+	my_command = ''
+	our_source_list = 'NO SOURCES FOUND - REMOVING rtmp(e), plugin and http info '
+	dbglog('Not using sources.xml')
+	if is_pvr:
+		my_command = my_command + "strPath NOT LIKE 'pvr://%'"
+		our_source_list = our_source_list + 'Keeping PVR info '
+	if bookmarks:
+		if my_command:
+			my_command = my_command + ' AND idFile NOT IN (SELECT idFile FROM bookmark)'
+		else: 
+			my_command = my_command + ' idFile NOT IN (SELECT idFile FROM bookmark)'
+		our_source_list = our_source_list + 'Keeping bookmarked files '
+	if excluding:
+		if my_command:
+			my_command = my_command + exclude_command
+		else:
+			my_command = my_command + exclude_command.replace('AND','',1)
+		our_source_list = our_source_list + 'Keeping items from excludes.xml '
+			
+# Build SQL query
+
+	if my_command: # this is SQL for no sources
+		sql = """DELETE FROM files WHERE idPath IN ( SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath Like 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%') AND (""" + my_command + """)));"""
+	else:
+		sql = """DELETE FROM files WHERE idPath IN (SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath LIKE 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%')));"""
+		
+dbglog('SQL command is %s' % sql)
+if not specificpath and not replacepath:
+	dbglog (our_source_list)			
+	our_select = sql.replace('DELETE FROM files','SELECT strPath FROM path',1)
+	if bookmarks:  # have to delete from paths table rather than files as there is a conflicting trigger on the files table
+		our_select = sql.replace('DELETE FROM files', 'SELECT strPath FROM path WHERE idPath in (SELECT idPath FROM files', 1)
+		our_select = our_select.replace('bookmark)', 'bookmark))',1)
+		sql = sql.replace('DELETE FROM files','DELETE FROM path',1)
+	dbglog('Select Command is %s' % our_select)
+elif not replacepath and specificpath:		# cleaning a specific path
+	if specific_path_to_remove != '':
+		sql = """delete from path where idPath in(select * from (SELECT idPath FROM path WHERE (strPath LIKE '""" + specific_path_to_remove +"""%')) as temptable)"""
+		our_select = "SELECT strPath FROM path WHERE idPath IN (SELECT idPath FROM path WHERE (strPath LIKE'" + specific_path_to_remove + "%'))"
+		dbglog('Select Command is %s' % our_select)
+	else:
+		xbmcgui.Dialog().ok(addonname,'Error - Specific path selected but no path defined. Script aborted')
+		dbglog("Error - Specific path selected with no path defined")
+		exit_on_error()
+else: # must be replacing a path at this point
+	if old_path != '' and new_path != '':
+		our_select = "SELECT strPath from path WHERE strPath Like '" + old_path + "%'"
+	else:
+		xbmcgui.Dialog().ok(addonname,'Error - Replace path selected but one or more paths are not defined. Script aborted')
+		dbglog('Error - Missing path for replacement')
+		exit_on_error()
+xbmc.sleep(500)
+
+if promptdelete:
+	cleaner_log_file(our_select, False)
+	mydisplay = MyClass('cleaner-window.xml', addonpath)
+	mydisplay.doModal()
+	del mydisplay
+	if flag == 1:
+		i = True
+	else:
+		i = False
+
+else:
+	i = True
+if i:
+	if autobackup == 'true' and not is_mysql:
+		backup_path = xbmc.translatePath('special://database/backups/'
+			).decode('utf-8')
+
+		if not xbmcvfs.exists(backup_path):
+			dbglog('Creating backup path %s' % backup_path)
+			xbmcvfs.mkdir(backup_path)
+		now = datetime.datetime.now()
+		if forcedbname:
+			our_dbname = forcedname
+		current_db = db_path + our_dbname + '.db'
+		if backup_filename == '':
+			backup_filename = our_dbname
+		backup_db = backup_path + backup_filename + '_' \
+			+ now.strftime('%Y-%m-%d_%H%M') + '.db'
+		backup_filename = backup_filename + '_' \
+			+ now.strftime('%Y-%m-%d_%H%M')
+		success = xbmcvfs.copy(current_db, backup_db)
+		if success == 1:
+			success = 'successful'
+		else:
+			success = 'failed'
+		dbglog('auto backup database %s.db to %s.db - result was %s'
+			% (our_dbname, backup_filename, success))
+	cleaner_log_file(our_select, True)
+	if not replacepath:
+		try:
+
+		# Execute the SQL command
+			dbglog('Executing SQL command - %s' % sql)
+			cursor.execute(sql)
+
+		# Commit the changes in the database
+
+			db.commit()
+		except Exception as e:
+
+		# Rollback in case there is any error
+
+			db.rollback()
+			dbglog('Error in db commit. Transaction rolled back')
+			dbglog('******************************************************************************')
+			dbglog('**  SQL ERROR  **  SQL ERROR   **  SQL ERROR  **  SQL ERROR  **  SQL ERROR  **')
+			dbglog('**   %s ' % e)
+			dbglog('******************************************************************************')
+			
+	else:
+		dbglog('Changing Paths - generating SQL statements')
+		our_select = "SELECT strPath from path WHERE strPath Like '" + old_path + "%'"
+		cursor.execute(our_select)
+		tempcount=0
+		listsize = len(cursor.fetchall())
+		dialog  = xbmcgui.DialogProgressBG()
+		dbglog('Creating progress dialog')
+		dialog.create('Replacing paths in database.  Please wait')
+		dialog.update(1)
+		dbglog('Cursor size is %d' % listsize)
+		cursor.execute(our_select)
+		renamepath_list = [] 
+		for strPath in cursor:	# build a list of paths to change
+			renamepath_list.append( ''.join(strPath))
+			
+			
+		for i in range(len(renamepath_list)):
+			tempcount += 1
+			our_old_path = renamepath_list[i]
+			our_new_path = our_old_path.replace(old_path, new_path,1)
+			sql = 'UPDATE path SET strPath ="' + our_new_path + '" WHERE strPath LIKE "' +our_old_path + '"'
+			dialog.update(percent = int((tempcount / float(listsize)) * 100))
+			dbglog('Percentage done %d' % int((tempcount / float(listsize)) * 100))
+			dbglog('SQL - %s' % sql)
+			try:
 				cursor.execute(sql)
-				cursor.execute('DELETE FROM files WHERE strFilename ="";')
-	
-			# Commit your changes in the database
-	
 				db.commit()
 			except Exception as e:
-	
-			# Rollback in case there is any error
-	
+				e = str(e)
 				db.rollback()
-				dbglog('Error in db commit. Transaction rolled back')
-				dbglog('******************************************************************************')
-				dbglog('**  SQL ERROR  **  SQL ERROR   **  SQL ERROR  **  SQL ERROR  **  SQL ERROR  **')
-				dbglog('**   %s ' % e)
-				dbglog('******************************************************************************')
-				
-		else:
-			dbglog('Changing Paths - generating SQL statements')
-			our_select = "SELECT strPath from path WHERE strPath Like '" + old_path + "%'"
-			cursor.execute(our_select)
-			tempcount=0
-			listsize = len(cursor.fetchall())
-			dialog  = xbmcgui.DialogProgressBG()
-			dbglog('Creating progress dialog')
-			dialog.create('Replacing paths in database.  Please wait')
-			dialog.update(1)
-			dbglog('Cursor size is %d' % listsize)
-			cursor.execute(our_select)
-			renamepath_list = [] 
-			for strPath in cursor:	# build a list of paths to change
-				renamepath_list.append( ''.join(strPath))
-				
-				
-			for i in range(len(renamepath_list)):
-				tempcount += 1
-				our_old_path = renamepath_list[i]
-				our_new_path = our_old_path.replace(old_path, new_path,1)
-				sql = 'UPDATE path SET strPath ="' + our_new_path + '" WHERE strPath LIKE "' +our_old_path + '"'
-				dialog.update(percent = int((tempcount / float(listsize)) * 100))
-				dbglog('Percentage done %d' % int((tempcount / float(listsize)) * 100))
-				dbglog('SQL - %s' % sql)
-				try:
-					cursor.execute(sql)
-					db.commit()
-				except Exception as e:
-					db.rollback()
-					dbglog('Error in db commit %s. Transaction rolled back' % e)
-	
-		# disconnect from server
+				dbglog('Error in db commit %s. Transaction rolled back' % e)
+
+	# disconnect from server
 #		xbmc.executebuiltin( "Dialog.Close(busydialog)" )
-		xbmc.sleep(1000)
-		dbglog('Closing progress dialog')
-		dialog.close()
-		db.close()
-		
-		# Make sure replacing or changing a path is a one-shot deal
-		
-		if replacepath or specificpath:
-			addon.setSetting('specificpath', 'false')
-			addon.setSetting('replacepath', 'false')
+	xbmc.sleep(1000)
+	dbglog('Closing progress dialog')
+	dialog.close()
+	db.close()
+	
+	# Make sure replacing or changing a path is a one-shot deal
+	
+	if replacepath or specificpath:
+		addon.setSetting('specificpath', 'false')
+		addon.setSetting('replacepath', 'false')
 
 
-		if autoclean:
-			xbmcgui.Dialog().notification(addonname,
-								'Running cleanup', xbmcgui.NOTIFICATION_INFO,
-								2000)
-			xbmc.sleep(2000)
+	if autoclean:
+		xbmcgui.Dialog().notification(addonname,
+							'Running cleanup', xbmcgui.NOTIFICATION_INFO,
+							2000)
+		xbmc.sleep(2000)
 
-			json_query = \
-				xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "VideoLibrary.Clean","id": 1 }'
-									)
-			json_query = unicode(json_query, 'utf-8', errors='ignore')
-			json_query = jsoninterface.loads(json_query)
-			if json_query.has_key('result'):
-				dbglog('Clean library sucessfully called')
-		else:
-			xbmcgui.Dialog().ok(addonname,
-								'Script finished.  You should run clean library for best results'
+		json_query = \
+			xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "VideoLibrary.Clean","id": 1 }'
 								)
-		dbglog('Script finished')
-		
+		json_query = unicode(json_query, 'utf-8', errors='ignore')
+		json_query = jsoninterface.loads(json_query)
+		if json_query.has_key('result'):
+			dbglog('Clean library sucessfully called')
 	else:
-		xbmcgui.Dialog().notification(addonname, 'Script aborted - No changes made', xbmcgui.NOTIFICATION_INFO, 3000)
-		dbglog('script aborted by user - no changes made')
-		WINDOW.setProperty('database-cleaner-running', 'false')
-
-		exit(1)
+		xbmcgui.Dialog().ok(addonname,
+							'Script finished.  You should run clean library for best results'
+							)
+	dbglog('Script finished')
+	
+else:
+	xbmcgui.Dialog().notification(addonname, 'Script aborted - No changes made', xbmcgui.NOTIFICATION_INFO, 3000)
+	dbglog('script aborted by user - no changes made')
 	WINDOW.setProperty('database-cleaner-running', 'false')
+
+	exit(1)
+WINDOW.setProperty('database-cleaner-running', 'false')
