@@ -278,10 +278,10 @@ else:
 
 
 def log(txt):
-	global bp_log, bp_logging
+	global bp_log, bplogging
 	if isinstance(txt, str):
 		txt = txt.decode('utf-8')
-	if bp_logging:
+	if bplogging:
 		now = datetime.datetime.now().strftime('%H:%M:%S.%f') 
 		message = u'%s: %s' % (now, txt + '\n')
 		message = message.encode('utf-8')
