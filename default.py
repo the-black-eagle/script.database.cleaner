@@ -219,9 +219,10 @@ addonpath = addon.getAddonInfo('path').decode('utf-8')
 advanced_file = xbmc.translatePath('special://profile/advancedsettings.xml').decode('utf-8')
 sources_file = xbmc.translatePath('special://profile/sources.xml').decode('utf-8')
 excludes_file = xbmc.translatePath('special://profile/addon_data/script.database.cleaner/excludes.xml').decode('utf-8')
+bp_logging = xbmc.translatePath('special://profile/addon_data/script.database.cleaner/bplogging').decode('utf-8')
 db_path = xbmc.translatePath('special://database').decode('utf-8')
 userdata_path = xbmc.translatePath('special://userdata').decode('utf-8')
-
+bp_logfile_path = xbmc.translatePath('special://temp/bp-debuglog.log').decode('utf-8')
 type_of_log =''
 is_pvr = addon.getSetting('pvr')
 autoclean = addon.getSetting('autoclean')
@@ -277,17 +278,27 @@ else:
 
 
 def log(txt):
+	global bp_log, bp_logging
 	if isinstance(txt, str):
 		txt = txt.decode('utf-8')
-	message = u'%s: %s' % (addonname, txt)
-	xbmc.log(msg=message.encode('utf-8'), level=xbmc.LOGDEBUG)  
+	if bp_logging:
+		now = datetime.datetime.now().strftime('%H:%M:%S.%f') 
+		message = u'%s: %s' % (now, txt + '\n')
+		message = message.encode('utf-8')
+		bp_log.write(message)
+	else:
+		message = u'%s: %s' % (addonname, txt)
+		xbmc.log(msg=message.encode('utf-8'), level=xbmc.LOGDEBUG)  
 	
 def dbglog(txt):
 	if debugging:
 		log(txt)
 		
 def exit_on_error():
+	global bp_logging, bp_log
 	WINDOW.setProperty('database-cleaner-running', 'false')
+	if bp_logging:
+		bp_log.close()
 	exit(1)
 
 		
@@ -392,8 +403,12 @@ def cleaner_log_file(our_select, cleaning):
 	logfile.write('\n\n')
 	logfile.close()
 	
-		
-		
+####	Start Here !!	####
+if xbmcvfs.exists(bp_logging):
+	bplogging = True
+	bp_log = xbmcvfs.File(bp_logfile_path,'w')
+else:
+	bplogging = False
 dbglog('script version %s started' % addonversion)
 if WINDOW.getProperty('database-cleaner-running') == 'true' and not debugging:  # <- remove this last bit for release !!
 	log('Video Database Cleaner already running')
@@ -843,6 +858,9 @@ else:
 	xbmcgui.Dialog().notification(addonname, 'Script aborted - No changes made', xbmcgui.NOTIFICATION_INFO, 3000)
 	dbglog('script aborted by user - no changes made')
 	WINDOW.setProperty('database-cleaner-running', 'false')
-
+	if bp_logging:
+		bp_log.close()
 	exit(1)
 WINDOW.setProperty('database-cleaner-running', 'false')
+if bp_logging:
+		bp_log.close()
