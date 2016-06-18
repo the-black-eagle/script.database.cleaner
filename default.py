@@ -295,9 +295,9 @@ def dbglog(txt):
 		log(txt)
 		
 def exit_on_error():
-	global bp_logging, bp_log
+	global bplogging, bp_log
 	WINDOW.setProperty('database-cleaner-running', 'false')
-	if bp_logging:
+	if bplogging:
 		bp_log.close()
 	exit(1)
 
@@ -858,9 +858,9 @@ else:
 	xbmcgui.Dialog().notification(addonname, 'Script aborted - No changes made', xbmcgui.NOTIFICATION_INFO, 3000)
 	dbglog('script aborted by user - no changes made')
 	WINDOW.setProperty('database-cleaner-running', 'false')
-	if bp_logging:
+	if bplogging:
 		bp_log.close()
 	exit(1)
 WINDOW.setProperty('database-cleaner-running', 'false')
-if bp_logging:
+if bplogging:
 		bp_log.close()
