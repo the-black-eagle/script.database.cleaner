@@ -10,6 +10,7 @@
         <setting id="promptdelete" label="32007" type="bool" default="true"/>
     </category>
 		<category label="32004">
+		<setting type="lsep"/>
         <setting id="logtolog" label="32025" type="bool" default="true"/>
         <setting id="typeoflog" label="32026" type="enum" lvalues="32027|32028" default="" enabled="eq(-1,true)" visible="eq(-1,true)"/>
         <setting id="debugging" label="32005" type="bool" default="false"/>
@@ -21,15 +22,18 @@
 		<setting label="32014" type="lsep"/>
 		<setting id="sourcefilepath" label="32011" type="file" default="" enable="eq(-3,true)+eq(-2,false)"/>
     </category>
+    <category label="32029">
+		<setting type="lsep"/>
+		<setting id="specificpath" label="32020" type="bool" default="false" enable="eq(3,false)"/>
+		<setting id="spcpathstr" label="32021" type="text" default="" enable="eq(-1,true)"/>
+		<setting type="lsep"/>
+		<setting id="replacepath" label="32022" type="bool" default="false" enable="eq(-3,false)"/>
+		<setting id="oldpath" label="32023" type="text" default="" enable="eq(-1,true)"/>
+		<setting id="newpath" label="32024" type="text" default="" enable="eq(-2,true)"/>
+    </category>
     <category label="32017">
-    <setting type="lsep"/>
-    <setting id="overridedb" label="32018" type="bool" default="false"/>
-    <setting id="forceddbname" label="32019" type="text" default="" enable="eq(-1,true)"/>
-    <setting id="specificpath" label="32020" type="bool" default="false" enable="eq(3,false)"/>
-    <setting id="spcpathstr" label="32021" type="text" default="" enable="eq(-1,true)"/>
-    <setting type="lsep"/>
-    <setting id="replacepath" label="32022" type="bool" default="false" enable="eq(-3,false)"/>
-    <setting id="oldpath" label="32023" type="text" default="" enable="eq(-1,true)"/>
-    <setting id="newpath" label="32024" type="text" default="" enable="eq(-2,true)"/>
+		<setting type="lsep"/>
+		<setting id="overridedb" label="32018" type="bool" default="false"/>
+		<setting id="forceddbname" label="32019" type="text" default="" enable="eq(-1,true)"/>
     </category>
 </settings>

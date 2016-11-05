@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="script.database.cleaner"
       name="Video Database Cleaner"
-      version="0.5.5"
+      version="0.5.7"
       provider-name="black_eagle, BatterPudding.">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
@@ -12,8 +12,7 @@
   <extension point="xbmc.addon.metadata">
     <platform>all</platform>
     <summary lang="en">A Script to clean Kodi's video database</summary>
-    <description lang="en">This program add-on will clean streams, old missing files and general junk from your video database. Works with both MySQL and SQLite libraries.
-    As well as removing old streams and missing files, the script can optionally remove or rename a specific path.  Please see the README or the forum thread for details (http://forum.kodi.tv/showthread.php?tid=272112).</description>
+    <description lang="en">This program add-on will clean streams, old missing files and general junk from your video database. Works with both MySQL and SQLite libraries.As well as removing old streams and missing files, the script can optionally remove or rename a specific path.  Please see the README or the forum thread for details (http://forum.kodi.tv/showthread.php?tid=272112).</description>
     <disclaimer lang="en_GB">Whilst every effort has been taken to ensure it doesn't, this script could break your database. Always make sure you back it up !!</disclaimer>
     <forum>http://forum.kodi.tv/showthread.php?tid=272112</forum>
   </extension>

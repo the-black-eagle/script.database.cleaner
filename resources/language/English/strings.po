@@ -119,3 +119,7 @@ msgstr ""
 msgctxt "#32028"
 msgid "Add to log each run"
 msgstr ""
+
+msgctxt "#32029"
+msgid "Path Manipulation"
+msgstr ""

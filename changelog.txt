@@ -1,3 +1,14 @@
+Version 0.5.7   30/10/16
+
+[Change]   Re-skin the GUI window - Now includes scrollable path list, better buttons etc etc
+[Remove]   Defunct code previously used to generate the GUI
+[Change]   Some cosmetic changes to various messages/warnings
+
+Version 0.5.6   15/10/16
+
+[Fix]     Apostrophes in paths causing SQL error
+[Change]  Tweak to information dialog
+
 Version 0.5.5   30/05/16
 
 [Add]    Ability to rename a path inside the database
