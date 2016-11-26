@@ -92,7 +92,6 @@
 			<scrolltime tween="Quadratic" easing="Out">1000</scrolltime>
 			<autoscroll>false</autoscroll>
 			<preloaditems>2</preloaditems>
-			<animation effect="fade" start="100" end="50" time="200" >Conditional</animation>
 			<itemlayout height="30">
 				<control type="label">
 					<left>68</left>
@@ -101,8 +100,10 @@
 					<height>28</height>
 					<font>font10</font>
 					<aligny>center</aligny>
+					<textcolor>FFFFFF00</textcolor>
 					<label>$INFO[ListItem.Label]</label>
 				</control>
+			
 			</itemlayout>
 			<focusedlayout height="30">
 				<control type="label">
@@ -112,8 +113,10 @@
 					<height>28</height>
 					<font>font10</font>
 					<aligny>center</aligny>
+					<textcolor>FFFFFF00</textcolor>
 					<label>$INFO[ListItem.Label]</label>
 				</control>
+			
 			</focusedlayout>
 		</control>
 		
@@ -154,6 +157,7 @@
 					<height>28</height>
 					<font>font10</font>
 					<aligny>center</aligny>
+					<textcolor>FFFFFF00</textcolor>
 					<label>$INFO[ListItem.Label]</label>
 				</control>
 				
@@ -166,6 +170,7 @@
 					<height>28</height>
 					<font>font10</font>
 					<aligny>center</aligny>
+					<textcolor>FFFFFF00</textcolor>
 					<label>$INFO[ListItem.Label]</label>
 				</control>
 				
@@ -186,12 +191,12 @@
 		
 		<!-- List control for Addon Settings -->
 		
-				<control type="list" id="10">	
+		<control type="list" id="10">	
 			<viewtype label="list_3">list</viewtype>
 			<left>1080</left>
 			<top>380</top>
 			<width>700</width>
-			<height>301</height>
+			<height>401</height>
 			<pagecontrol>61</pagecontrol>
 			<onleft>5</onleft>
 			<onright>5</onright>
@@ -200,12 +205,55 @@
 			<orientation>vertical</orientation>
 			<autoscroll delay="500" time="1000" repeat="800">true</autoscroll>
 			<preloaditems>2</preloaditems>
-			<animation effect="fade" start="100" end="50" time="200">Conditional</animation>
 			<itemlayout height="30">
 				<control type="label">
 					<left>68</left>
 					<top>0</top>
 					<width>400</width>
+					<height>28</height>
+					<font>font10</font>
+					<aligny>center</aligny>
+					<textcolor>FFFFFF00</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+				</control>
+				
+			</itemlayout>
+			<focusedlayout height="30">
+				<control type="label">
+					<left>68</left>
+					<top>0</top>
+					<width>400</width>
+					<height>28</height>
+					<font>font10</font>
+					<aligny>center</aligny>
+					<textcolor>FFFFFF00</textcolor>
+					<label>$INFO[ListItem.Label]</label>
+				</control>
+				
+			</focusedlayout>
+		</control>
+		
+		<!-- List control for Addon Settings -->
+		
+		<control type="list" id="12">	
+			<viewtype label="list_4">list</viewtype>
+			<left>1480</left>
+			<top>380</top>
+			<width>200</width>
+			<height>401</height>
+			<pagecontrol>61</pagecontrol>
+			<onleft>5</onleft>
+			<onright>5</onright>
+			<onup>6</onup>
+			<ondown>6</ondown>
+			<orientation>vertical</orientation>
+			<autoscroll delay="500" time="1000" repeat="800">true</autoscroll>
+			<preloaditems>2</preloaditems>
+			<itemlayout height="30">
+				<control type="label">
+					<left>68</left>
+					<top>0</top>
+					<width>150</width>
 					<height>28</height>
 					<font>font10</font>
 					<aligny>center</aligny>
@@ -217,7 +265,7 @@
 				<control type="label">
 					<left>68</left>
 					<top>0</top>
-					<width>400</width>
+					<width>150</width>
 					<height>28</height>
 					<font>font10</font>
 					<aligny>center</aligny>
@@ -231,7 +279,7 @@
 		
 		<control type="label" id="20">
 			<left>200</left>
-			<top>800</top>
+			<top>870</top>
 			<width>auto</width>
 			<height>28</height>
 			<font>font10</font>
@@ -241,13 +289,27 @@
 		
 		<control type="label" id="21">
 			<left>200</left>
-			<top>830</top>
+			<top>900</top>
 			<width>auto</width>
 			<height>28</height>
 			<font>font10</font>
 			<aligny>center</aligny>
 			<label>-</label>
 		</control>
+		
+		<!-- Number of entries found -->
+		
+		<control type="label" id="22">
+			<left>800</left>
+			<top>800</top>
+			<width>auto</width>
+			<height>28</height>
+			<font>font10</font>
+			<aligny>center</aligny>
+			<textcolor>FFFF00FF</textcolor>
+			<label>-</label>
+		</control>
+		
 		
 		<!--  Clean and Abort Buttons -->
 		

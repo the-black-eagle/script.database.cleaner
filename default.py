@@ -64,29 +64,35 @@ class MyClass(xbmcgui.WindowXMLDialog):
         self.container = self.getControl(6)
         self.container2 = self.getControl(8)
         self.container3 = self.getControl(10)
+        self.container4 = self.getControl(12)
         self.listitems = []
         self.excludesitems = []
         self.addonsettings = []
+        self.addonsettings_on_off = []
         
     #       List paths from sources.xml 
         if not specificpath and not replacepath:
             self.display_list = display_list
+            WINDOW.setProperty('sourcecolour','FFFFFF00')
             for i in range(len(self.display_list)):
-                self.listitems.append('[COLOR yellow]'+ self.display_list[i] + '[/COLOR]')
+                self.listitems.append(self.display_list[i])
             if no_sources:
-                self.listitems.append('[COLOR red][B]No sources are in use[/B][/COLOR]')
-                self.listitems.append('[COLOR red][B]All streaming paths will be removed[/B][/COLOR]')
+                WINDOW.setProperty('sourcecolour','FFFF0000')
+                self.listitems.append('No sources are in use')
+                self.listitems.append('All streaming paths will be removed')
                 if excluding:
-					self.listitems.append('')
-					self.listitems.append('[COLOR red][B]Paths from excludes.xml will be kept[/B][/COLOR]')
+                    self.listitems.append('')
+                    self.listitems.append('Paths from excludes.xml will be kept')
         if replacepath:
-            self.listitems.append('[COLOR yellow]Replacing a path[/COLOR]')
-            self.listitems.append('[COLOR yellow]in your database[/COLOR]')
-            self.listitems.append('[COLOR yellow]Confirm details below[/COLOR]')
+            WINDOW.setProperty('sourcecolour','FFFFFF00')
+            self.listitems.append('Replacing a path')
+            self.listitems.append('in your database')
+            self.listitems.append('Confirm details below')
         if specificpath:
-            self.listitems.append('[COLOR yellow]Removing a path[/COLOR]')
-            self.listitems.append('[COLOR yellow]in your database[/COLOR]')
-            self.listitems.append('[COLOR yellow]Confirm details below[/COLOR]')
+            WINDOW.setProperty('sourcecolour','FFFFFF00')
+            self.listitems.append('Removing a path')
+            self.listitems.append('in your database')
+            self.listitems.append('Confirm details below')
         self.container.addItems(self.listitems)
     #       List paths in excludes.xml (if it exists)
         
@@ -94,7 +100,7 @@ class MyClass(xbmcgui.WindowXMLDialog):
 
         if excluding:
             for i in range(len(self.excludes_list)):
-                self.excludesitems.append('[COLOR yellow]' + self.excludes_list[i]+ '[/COLOR]')
+                self.excludesitems.append(self.excludes_list[i])
         else:
             self.excludesitems.append("Not Present")
         self.container2.addItems(self.excludesitems)
@@ -103,47 +109,91 @@ class MyClass(xbmcgui.WindowXMLDialog):
  
         if is_pvr and (not specificpath and not replacepath):
             self.addonsettings.append('Keep PVR information')
-        if bookmarks and (not specificpath and not replacepath):
-             self.addonsettings.append('Keep bookmark information')
-        if autoclean:
-            self.addonsettings.append('Auto call Clean Library')
-        if promptdelete:
-            self.addonsettings.append('Show summary window (This window !!)')
-        if autobackup == 'true' and not is_mysql:
-            self.addonsettings.append('Auto backing up local database')
-        if no_sources or specificpath or replacepath:
-            self.addonsettings.append('[COLOR red]Not[/COLOR] using info from sources.xml')
-        if specificpath:
-            self.addonsettings.append('[COLOR red]Cleaning a specific path[/COLOR]')
-        if replacepath:
-            self.addonsettings.append('[COLOR red]Replacing a path[/COLOR]')
-        if enable_logging:
-            self.addonsettings.append('Writing a logfile to Kodi TEMP directory')
-        if debugging:
-            debug_string = 'Debugging [COLOR red]enabled[/COLOR]'
+            self.addonsettings_on_off.append('ON')
         else:
-            debug_string = 'Debugging [COLOR green]disabled[/COLOR]'
-        self.addonsettings.append(debug_string)
-        self.addonsettings.append('') #blank line
-        #   Display the name of the database we are connected to
-        self.addonsettings.append('Database is - [COLOR green][B]%s[/B][/COLOR]' % our_dbname)
+            self.addonsettings.append('Keep PVR information')
+            self.addonsettings_on_off.append('OFF')
+
+        if bookmarks and (not specificpath and not replacepath):
+            self.addonsettings.append('Keep bookmark information')
+            self.addonsettings_on_off.append('ON')
+        else:
+            self.addonsettings.append('Keep bookmark information')
+            self.addonsettings_on_off.append('OFF')
+
+        if autoclean:
+            self.addonsettings.append('Automatically trigger Clean Library')
+            self.addonsettings_on_off.append('ON')
+        else:
+            self.addonsettings.append('Automatically trigger Clean Library')
+            self.addonsettings_on_off.append('OFF')
+        if promptdelete:
+            self.addonsettings.append('Show summary window')
+            self.addonsettings_on_off.append('ON')
+        else:
+            self.addonsettings.append('Show summary window')
+            self.addonsettings_on_off.append('OFF')
+        if autobackup == 'true' and not is_mysql:
+            self.addonsettings.append('Back up local database before cleaning')
+            self.addonsettings_on_off.append('ON')
+        else:
+            self.addonsettings.append('Back up local database before cleaning')
+            self.addonsettings_on_off.append('OFF')
+        if no_sources or specificpath or replacepath:
+            self.addonsettings.append('Use sources.xml')
+            self.addonsettings_on_off.append('OFF')
+        else:
+            self.addonsettings.append('Use sources.xml')
+            self.addonsettings_on_off.append('ON')
+        if specificpath:
+            self.addonsettings.append('Cleaning a specific path')
+            self.addonsettings_on_off.append('ON')
+        else:
+            self.addonsettings.append('Cleaning a specific path')
+            self.addonsettings_on_off.append('OFF')
+        if replacepath:
+            self.addonsettings.append('Replacing a path')
+            self.addonsettings_on_off.append('ON')
+        else:
+            self.addonsettings.append('Replacing a path')
+            self.addonsettings_on_off.append('OFF')
+        if enable_logging:
+            self.addonsettings.append('Log paths to database-cleaner.log')
+            self.addonsettings_on_off.append('ON')
+        else:
+            self.addonsettings.append('Log paths to database-cleaner.log')
+            self.addonsettings_on_off.append('OFF')
+        if debugging:
+            self.addonsettings.append('Enable debugging to Kodi debug log')
+            self.addonsettings_on_off.append('ON')
+        else:
+            self.addonsettings.append('Enable debugging Kodi debug log')
+            self.addonsettings_on_off.append('OFF')
+         #   Display the name of the database we are connected to
+        db_string = 'Database'
+#        db_string = db_string.ljust(42-(len(our_dbname)))
+#        db_string = db_string + our_dbname
+        self.addonsettings.append(db_string)
+        self.addonsettings_on_off.append(our_dbname)
+
         cursor.execute(our_select)
         data_list = cursor.fetchall()
         data_list_size = len(data_list)
         if replacepath:
-            self.addonsettings.append('[COLOR red][B]There are %d paths to be changed[/B][/COLOR]' % data_list_size)
+            self.getControl(22).setLabel('There are %d paths to be changed' % data_list_size)
         else:
-            self.addonsettings.append('[COLOR red][B]There are %d entries to be removed[/B][/COLOR]' % data_list_size)
+            self.getControl(22).setLabel('There are %d entries to be removed' % data_list_size)
 
         self.container3.addItems(self.addonsettings)
+        self.container4.addItems(self.addonsettings_on_off)
         #   Show warning about backup if using MySQL    
         if is_mysql:
-            self.getControl(20).setLabel('WARNING - MySQL database [COLOR red][B]not[/B][/COLOR] backed up automatically, please do this [B]manually[/B]')
+            self.getControl(20).setLabel('WARNING - MySQL database not backed up automatically, please do this manually')
         if specificpath:
-            self.getControl(20).setLabel('WARNING - Removing specific path [COLOR yellow]%s[/COLOR] ' % specific_path_to_remove)
+            self.getControl(20).setLabel("WARNING - Removing specific path '%s' " % specific_path_to_remove)
         if replacepath:
-            self.getControl(20).setLabel('WARNING - Renaming specific path from [COLOR yellow]%s[/COLOR] ' % old_path)
-            self.getControl(21).setLabel('TO  [COLOR yellow]%s[/COLOR] ' % new_path)
+            self.getControl(20).setLabel("WARNING - Renaming specific path from '%s' " % old_path)
+            self.getControl(21).setLabel("TO '%s' " % new_path)
 
  
     def onAction(self, action):
@@ -677,7 +727,7 @@ xbmc.sleep(500)
 
 if promptdelete:
     cleaner_log_file(our_select, False)
-    mydisplay = MyClass('cleaner-window.xml', addonpath)
+    mydisplay = MyClass('script.database.cleaner-summary.xml', addonpath)
     mydisplay.doModal()
     del mydisplay
     if flag == 1:
