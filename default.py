@@ -167,7 +167,7 @@ class MyClass(xbmcgui.WindowXMLDialog):
             self.addonsettings.append('Enable debugging to Kodi debug log')
             self.addonsettings_on_off.append('ON')
         else:
-            self.addonsettings.append('Enable debugging Kodi debug log')
+            self.addonsettings.append('Enable debugging to Kodi debug log')
             self.addonsettings_on_off.append('OFF')
          #   Display the name of the database we are connected to
         db_string = 'Database'
