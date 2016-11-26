@@ -1,3 +1,8 @@
+Version 0.5.7-1 26/11/16
+
+[Change]   Cosmetic changes to GUI window to allow skins to support the add-on with their own skin
+
+
 Version 0.5.7   30/10/16
 
 [Change]   Re-skin the GUI window - Now includes scrollable path list, better buttons etc etc
