@@ -811,3 +811,4 @@ else:
     WINDOW.setProperty('database-cleaner-running', 'false')
     exit(1)
 WINDOW.setProperty('database-cleaner-running', 'false')
+
