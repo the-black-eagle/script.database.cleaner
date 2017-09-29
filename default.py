@@ -388,10 +388,14 @@ if found:
             except:
                 log('Unable to determine MySQL password')
             try:
+                our_port = videodb.find('port').text
+            except:
+                log('Unable to find MySQL port')
+            try:
                 our_dbname = videodb.find('name').text
             except:
                 our_dbname = 'MyVideos'
-            dbglog('MySQL details - %s, %s, %s' % (our_host, our_username, our_dbname))
+            dbglog('MySQL details - %s, %s, %s, %s' % (our_host, our_port, our_username, our_dbname))
             is_mysql = True
     except Exception as e:
         e =str(e)
@@ -510,7 +514,7 @@ if is_mysql and not forcedbname:
             testname = our_dbname + str(num)
             try:
                 dbglog('Attempting MySQL connection to %s' % testname)
-                db = mysql.connector.connect(user=our_username, database=testname, password=our_password, host=our_host)
+                db = mysql.connector.connect(user=our_username, database=testname, password=our_password, host=our_host, port=our_port)
                 if db.is_connected():
                     our_dbname = testname
                     dbglog('Connected to MySQL database %s' % our_dbname)
@@ -523,7 +527,7 @@ if is_mysql and not forcedbname:
         exit_on_error()
 elif is_mysql and forcedbname:
     try:
-        db = mysql.connector.connect(user=our_username, database=forcedname, password=our_password, host=our_host)
+        db = mysql.connector.connect(user=our_username, database=forcedname, password=our_password, host=our_host, port=our_port)
         if db.is_connected():
             our_dbname = forcedname
             dbglog('Connected to forced MySQL database %s' % forcedname)
@@ -807,7 +811,3 @@ else:
     WINDOW.setProperty('database-cleaner-running', 'false')
     exit(1)
 WINDOW.setProperty('database-cleaner-running', 'false')
-
-        
-
-   
