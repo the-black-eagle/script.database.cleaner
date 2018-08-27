@@ -60,7 +60,6 @@ class MyClass(xbmcgui.WindowXMLDialog):
     def __init__( self, *args, **kwargs  ): pass
     
     def onInit( self ):
-        self.setCoordinateResolution(0)
         self.container = self.getControl(6)
         self.container2 = self.getControl(8)
         self.container3 = self.getControl(10)
@@ -681,7 +680,7 @@ xbmc.sleep(500)
 
 if promptdelete:
     cleaner_log_file(our_select, False)
-    mydisplay = MyClass('cleaner-window.xml', addonpath)
+    mydisplay = MyClass('cleaner-window.xml', addonpath, 'Default', '1080i')
     mydisplay.doModal()
     del mydisplay
     if flag == 1:
