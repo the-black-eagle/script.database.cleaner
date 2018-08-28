@@ -1,3 +1,6 @@
+Version 0.5.8   28/08/18
+[Fix] Compatibility with Kodi 18 (Thanks Kib!)
+
 Version 0.5.7   30/10/16
 
 [Change]   Re-skin the GUI window - Now includes scrollable path list, better buttons etc etc
