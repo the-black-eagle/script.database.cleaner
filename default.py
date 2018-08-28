@@ -17,17 +17,17 @@
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation; either version 2 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  This program is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
-#  
+#
 
 
 import datetime
@@ -58,17 +58,16 @@ WINDOW = xbmcgui.Window(10000)
 
 class MyClass(xbmcgui.WindowXMLDialog):
     def __init__( self, *args, **kwargs  ): pass
-    
+
     def onInit( self ):
-        self.setCoordinateResolution(0)
         self.container = self.getControl(6)
         self.container2 = self.getControl(8)
         self.container3 = self.getControl(10)
         self.listitems = []
         self.excludesitems = []
         self.addonsettings = []
-        
-    #       List paths from sources.xml 
+
+    #       List paths from sources.xml
         if not specificpath and not replacepath:
             self.display_list = display_list
             for i in range(len(self.display_list)):
@@ -89,7 +88,6 @@ class MyClass(xbmcgui.WindowXMLDialog):
             self.listitems.append('[COLOR yellow]Confirm details below[/COLOR]')
         self.container.addItems(self.listitems)
     #       List paths in excludes.xml (if it exists)
-        
         self.excludes_list = excludes_list
 
         if excluding:
@@ -98,13 +96,13 @@ class MyClass(xbmcgui.WindowXMLDialog):
         else:
             self.excludesitems.append("Not Present")
         self.container2.addItems(self.excludesitems)
-            
+
     #       List the relevant addon settings
- 
+
         if is_pvr and (not specificpath and not replacepath):
             self.addonsettings.append('Keep PVR information')
         if bookmarks and (not specificpath and not replacepath):
-             self.addonsettings.append('Keep bookmark information')
+            self.addonsettings.append('Keep bookmark information')
         if autoclean:
             self.addonsettings.append('Auto call Clean Library')
         if promptdelete:
@@ -136,7 +134,7 @@ class MyClass(xbmcgui.WindowXMLDialog):
             self.addonsettings.append('[COLOR red][B]There are %d entries to be removed[/B][/COLOR]' % data_list_size)
 
         self.container3.addItems(self.addonsettings)
-        #   Show warning about backup if using MySQL    
+        #   Show warning about backup if using MySQL
         if is_mysql:
             self.getControl(20).setLabel('WARNING - MySQL database [COLOR red][B]not[/B][/COLOR] backed up automatically, please do this [B]manually[/B]')
         if specificpath:
@@ -145,7 +143,6 @@ class MyClass(xbmcgui.WindowXMLDialog):
             self.getControl(20).setLabel('WARNING - Renaming specific path from [COLOR yellow]%s[/COLOR] ' % old_path)
             self.getControl(21).setLabel('TO  [COLOR yellow]%s[/COLOR] ' % new_path)
 
- 
     def onAction(self, action):
         global flag
         dbglog('Got an action %s' % action.getId())
@@ -197,7 +194,6 @@ enable_logging = addon.getSetting('logtolog')
 if enable_logging == 'true':
     enable_logging = True
     type_of_log = addon.getSetting('typeoflog')
-    
 else:
     enable_logging = False
 if replacepath == 'true':
@@ -235,22 +231,20 @@ else:
 
 
 def log(txt):
-    
+
     if isinstance(txt, str):
         txt = txt.decode('utf-8')
         message = u'%s: %s' % (addonname, txt)
-        xbmc.log(msg=message.encode('utf-8'), level=xbmc.LOGDEBUG)  
-    
+        xbmc.log(msg=message.encode('utf-8'), level=xbmc.LOGDEBUG)
+
 def dbglog(txt):
     if debugging:
         log(txt)
-        
+
 def exit_on_error():
     WINDOW.setProperty('database-cleaner-running', 'false')
     exit(1)
 
-        
-        
 def cleaner_log_file(our_select, cleaning):
     cleaner_log = xbmc.translatePath('special://temp/database-cleaner.log').decode('utf-8')
     old_cleaner_log = xbmc.translatePath('special://temp/database-cleaner.old.log').decode('utf-8')
@@ -278,7 +272,7 @@ def cleaner_log_file(our_select, cleaning):
         old_log= xbmcvfs.File(cleaner_log)
         old_log_contents=old_log.read()
         old_log.close()
-    
+
     now = datetime.datetime.now()
     logfile=xbmcvfs.File(cleaner_log, 'w')
     if old_log_contents:
@@ -300,7 +294,7 @@ def cleaner_log_file(our_select, cleaning):
         dbglog('Creating progress dialog for logfile')
         dialog.create('Getting required data.  Please wait')
         dialog.update(1)
-    
+
     if not cleaning and not replacepath:
         logfile.write('The following file paths would be removed from your database')
         logfile.write('\n\n')
@@ -348,19 +342,19 @@ def cleaner_log_file(our_select, cleaning):
     if counting == 0:  # nothing to remove
         logfile.write('No paths have been found to remove\n')
     if do_progress:
-        dialog.close()  
+        dialog.close()
     logfile.write('\n\n')
     logfile.close()
-    
+
 ####    Start Here !!   ####
 
 dbglog('script version %s started' % addonversion)
-#if WINDOW.getProperty('database-cleaner-running') == 'true': 
+#if WINDOW.getProperty('database-cleaner-running') == 'true':
     #log('Video Database Cleaner already running')
     #exit(0)
 #else:
     #WINDOW.setProperty('database-cleaner-running', 'true')
-    
+
 xbmcgui.Dialog().notification(addonname, 'Starting Up', xbmcgui.NOTIFICATION_INFO, 2000)
 xbmc.sleep(2000)
 
@@ -453,8 +447,6 @@ if promptdelete:
 if no_sources:
     dbglog('Not using sources.xml')
 
-
-    
 if source_file_path != '':
     sources_file = source_file_path
     remote_file = True
@@ -619,9 +611,9 @@ if not no_sources:
     if bookmarks:
         my_command = my_command + ' AND idFile NOT IN (SELECT idFile FROM bookmark)'
         our_source_list = our_source_list + 'Keeping bookmarked files '
-        
+
         # construct the full SQL query
-        
+
     sql = \
         """DELETE FROM files WHERE idPath IN(SELECT idPath FROM path where (""" + my_command + """));"""
 if no_sources:
@@ -634,7 +626,7 @@ if no_sources:
     if bookmarks:
         if my_command:
             my_command = my_command + ' AND idFile NOT IN (SELECT idFile FROM bookmark)'
-        else: 
+        else:
             my_command = my_command + ' idFile NOT IN (SELECT idFile FROM bookmark)'
         our_source_list = our_source_list + 'Keeping bookmarked files '
     if excluding:
@@ -643,7 +635,7 @@ if no_sources:
         else:
             my_command = my_command + exclude_command.replace('AND','',1)
         our_source_list = our_source_list + 'Keeping items from excludes.xml '
-            
+
 # Build SQL query
 
 if not no_sources: # this is SQL for no sources
@@ -654,7 +646,7 @@ else:
 #   sql2= """DELETE FROM path WHERE idPath IN (SELECT * FROM( SELECT idPath FROM path WHERE (strPath LIKE 'rtmp://%' OR strPath Like 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%') as pathsub);"""   
 dbglog('SQL command is %s' % sql)
 if not specificpath and not replacepath:
-    dbglog (our_source_list)            
+    dbglog (our_source_list)
     our_select = sql.replace('DELETE FROM files','SELECT strPath FROM path',1)
     if bookmarks:  # have to delete from paths table rather than files as there is a conflicting trigger on the files table
         our_select = sql.replace('DELETE FROM files', 'SELECT strPath FROM path WHERE idPath in (SELECT idPath FROM files', 1)
@@ -681,7 +673,7 @@ xbmc.sleep(500)
 
 if promptdelete:
     cleaner_log_file(our_select, False)
-    mydisplay = MyClass('cleaner-window.xml', addonpath)
+    mydisplay = MyClass('cleaner-window.xml', addonpath, 'Default', '1080i')
     mydisplay.doModal()
     del mydisplay
     if flag == 1:
@@ -727,7 +719,7 @@ if i:
         # Commit the changes in the database
 
             db.commit()
-            
+
         except Exception as e:
 
         # Rollback in case there is any error
@@ -738,7 +730,7 @@ if i:
             dbglog('**  SQL ERROR  **  SQL ERROR   **  SQL ERROR  **  SQL ERROR  **  SQL ERROR  **')
             dbglog('**   %s ' % e)
             dbglog('******************************************************************************')
-            
+
     else:
         dbglog('Changing Paths - generating SQL statements')
         our_select = "SELECT strPath from path WHERE strPath Like '" + old_path + "%'"
@@ -751,11 +743,10 @@ if i:
         dialog.update(1)
         dbglog('Cursor size is %d' % listsize)
         cursor.execute(our_select)
-        renamepath_list = [] 
+        renamepath_list = []
         for strPath in cursor:  # build a list of paths to change
             renamepath_list.append( ''.join(strPath))
-            
-            
+
         for i in range(len(renamepath_list)):
             tempcount += 1
             our_old_path = renamepath_list[i]
@@ -780,7 +771,7 @@ if i:
     db.close()
     dbglog("Database connection closed")
     # Make sure replacing or changing a path is a one-shot deal
-    
+
     if replacepath or specificpath:
         addon.setSetting('specificpath', 'false')
         addon.setSetting('replacepath', 'false')
@@ -804,7 +795,7 @@ if i:
                             'Script finished.  You should run clean library for best results'
                             )
     dbglog('Script finished')
-    
+
 else:
     xbmcgui.Dialog().notification(addonname, 'Script aborted - No changes made', xbmcgui.NOTIFICATION_INFO, 3000)
     dbglog('script aborted by user - no changes made')
