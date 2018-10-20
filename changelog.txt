@@ -1,3 +1,6 @@
+Version 0.5.9   20/10/18
+[Add]      Error notification if there are malformed comments or tags in advancedsettings.xml
+
 Version 0.5.8   28/08/18
 [Fix] Compatibility with Kodi 18 (Thanks Kib!)
 
@@ -46,10 +49,3 @@ Version 0.5.1
 Version 0.5.0
 
 Initial beta testing release
-
-
-
-
-
-
-

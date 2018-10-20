@@ -76,8 +76,8 @@ class MyClass(xbmcgui.WindowXMLDialog):
                 self.listitems.append('[COLOR red][B]No sources are in use[/B][/COLOR]')
                 self.listitems.append('[COLOR red][B]All streaming paths will be removed[/B][/COLOR]')
                 if excluding:
-					self.listitems.append('')
-					self.listitems.append('[COLOR red][B]Paths from excludes.xml will be kept[/B][/COLOR]')
+                    self.listitems.append('')
+                    self.listitems.append('[COLOR red][B]Paths from excludes.xml will be kept[/B][/COLOR]')
         if replacepath:
             self.listitems.append('[COLOR yellow]Replacing a path[/COLOR]')
             self.listitems.append('[COLOR yellow]in your database[/COLOR]')
@@ -365,7 +365,12 @@ if xbmcvfs.exists(advanced_file):
 if found:
     msg = advanced_file.encode('utf-8')
     dbglog('looking in advancedsettings for videodatabase info')
-    advancedsettings = ET.parse(advanced_file)
+    try:
+        advancedsettings = ET.parse(advanced_file)
+    except ET.ParseError:
+        dbglog('Error parsing advancedsettings.xml file')
+        xbmcgui.Dialog().ok(addonname, 'Error parsing advancedsettings.xml file[CR] Possibly a mal-formed comment or missing closing tag - script aborted')
+        exit_on_error()
     root = advancedsettings.getroot()
     try:
         for videodb in root.findall('videodatabase'):
@@ -643,7 +648,7 @@ if not no_sources: # this is SQL for no sources
 #   sql2="""DELETE FROM path WHERE idPath IN (SELECT * FROM( SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath Like 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%') AND (""" + my_command +"""))) as pathsub);"""
 else:
     sql = """DELETE FROM files WHERE idPath IN (SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath LIKE 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%' OR strPath LIKE 'https://%') AND (""" + my_command + """)));"""
-#   sql2= """DELETE FROM path WHERE idPath IN (SELECT * FROM( SELECT idPath FROM path WHERE (strPath LIKE 'rtmp://%' OR strPath Like 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%') as pathsub);"""   
+#   sql2= """DELETE FROM path WHERE idPath IN (SELECT * FROM( SELECT idPath FROM path WHERE (strPath LIKE 'rtmp://%' OR strPath Like 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%') as pathsub);"""
 dbglog('SQL command is %s' % sql)
 if not specificpath and not replacepath:
     dbglog (our_source_list)
@@ -802,4 +807,3 @@ else:
     WINDOW.setProperty('database-cleaner-running', 'false')
     exit(1)
 WINDOW.setProperty('database-cleaner-running', 'false')
-
