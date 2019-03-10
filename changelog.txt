@@ -1,3 +1,5 @@
+[Fix] Compatibility with Kodi 18 (aka Leia) as released
+
 Version 0.5.9   20/10/18
 [Add]      Error notification if there are malformed comments or tags in advancedsettings.xml
 
