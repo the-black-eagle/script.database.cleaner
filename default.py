@@ -11,7 +11,7 @@
 # Version 28b/3 - Tidy up temp path code, remove some unused code
 # Version 29b/1 - Add ability to rename paths inside the db
 # Version 29b/2 - Fix incorrectly altered SQL
-# Version 30/b1 - UI improvements - only allow one instance
+# Version 30b/1 - UI improvements - only allow one instance
 
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -47,6 +47,11 @@ import xbmcaddon
 import xbmcgui
 
 import xbmcvfs
+
+# database versions to scan for
+MIN_VIDEODB_VERSION = 35
+MAX_VIDEODB_VERSION = 116  # i.e. Leia, aka Kodi 18
+
 
 ACTION_PREVIOUS_MENU = 10
 ACTION_SELECT_ITEM = 7
@@ -404,14 +409,14 @@ if found:
 if not is_mysql:
     our_dbname = 'MyVideos'
 
-    for num in range(114, 35, -1):
+    for num in range(MAX_VIDEODB_VERSION, MIN_VIDEODB_VERSION, -1):
         testname = our_dbname + str(num)
         our_test = db_path + testname + '.db'
 
         dbglog('Checking for local database %s' % testname)
         if xbmcvfs.exists(our_test):
             break
-    if num != 35:
+    if num != MIN_VIDEODB_VERSION:
         our_dbname = testname
 
     if our_dbname == 'MyVideos':
@@ -493,7 +498,7 @@ if forcedbname:
 if is_mysql and not forcedbname:
     if our_dbname == '': # no db name in advancedsettings
         our_dbname = 'MyVideos'
-        for num in range(114, 35, -1):
+        for num in range(MAX_VIDEODB_VERSION, MIN_VIDEODB_VERSION, -1):
             testname = our_dbname + str(num)
             try:
                 dbglog('Attempting MySQL connection to %s' % testname)
@@ -507,7 +512,7 @@ if is_mysql and not forcedbname:
             except:
                 pass
     else:       # already got db name from ad settings
-        for num in range(114, 35, -1):
+        for num in range(MAX_VIDEODB_VERSION, MIN_VIDEODB_VERSION, -1):
             testname = our_dbname + str(num)
             try:
                 dbglog('Attempting MySQL connection to %s' % testname)
