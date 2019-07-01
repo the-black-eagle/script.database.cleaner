@@ -654,6 +654,8 @@ if not no_sources: # this is SQL for no sources
 else:
     sql = """DELETE FROM files WHERE idPath IN (SELECT idPath FROM path WHERE ((strPath LIKE 'rtmp://%' OR strPath LIKE 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%' OR strPath LIKE 'https://%') AND (""" + my_command + """)));"""
 #   sql2= """DELETE FROM path WHERE idPath IN (SELECT * FROM( SELECT idPath FROM path WHERE (strPath LIKE 'rtmp://%' OR strPath Like 'rtmpe:%' OR strPath LIKE 'plugin:%' OR strPath LIKE 'http://%') as pathsub);"""
+if my_command == "":
+    sql=sql.replace('((strPath','(strPath').replace(' AND ()))',')')
 dbglog('SQL command is %s' % sql)
 if not specificpath and not replacepath:
     dbglog (our_source_list)

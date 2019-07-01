@@ -1,3 +1,7 @@
+Version 0.6.1    01/07/19
+[Fix] Sql error when no sources are spcified or found and no other settings are enabled
+
+Version 0.6.0
 [Fix] Compatibility with Kodi 18 (aka Leia) as released
 
 Version 0.5.9   20/10/18
