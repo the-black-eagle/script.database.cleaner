@@ -223,7 +223,7 @@ if show_docs == 'true':
     show_docs = 'True'
     addon.setSetting('showdocs','false')
 else:
-    show_docs = 'False'
+    show_docs = None
 is_pvr = addon.getSetting('pvr')
 autoclean = addon.getSetting('autoclean')
 bookmarks = addon.getSetting('bookmark')
@@ -405,7 +405,7 @@ xbmcgui.Dialog().notification(addonname, 'Starting Up', xbmcgui.NOTIFICATION_INF
 xbmc.sleep(2000)
 
 log('userdata path [%s] ' %userdata_path)
-if show_docs == True:
+if show_docs:
     mydisplay = displayDocs('cleaner-docs.xml', addonpath, 'Default', '1080i')
     mydisplay.doModal()
     del mydisplay
