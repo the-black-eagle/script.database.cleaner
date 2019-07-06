@@ -13,9 +13,9 @@ with a date and time stamp appended.  MySQL users need to manually back-up
 their database.
 
 Users can also choose (via the add-on settings) to retain or remove old 
-PVR information and to retain or remove bookmarks.  As of V0.5.5 all the different
-settings are documented in the file **docs.txt** which is included with the add-on
-and can be found in the add-on's directory.
+PVR information and to retain or remove bookmarks.  As of V0.6.2 all the different
+settings are documented in the file **docs.txt** which is displayed on first run of the add-on
+and can be found in the add-on's directory or re-displayed via the addon's settings
 
 When run, the script will prompt with a summary window containing a list
 of the paths to retain in the database. Users are encouraged to check that 
@@ -24,7 +24,7 @@ are also displayed, along with the contents of any 'excludes.xml' file.
 The name of the currently connected database is also displayed.
 If you are using MySQL, there will also be a warning to back up your database
 manually.  You have the option to either abort the script, or to clean the database. 
-Clicking on 'DO IT !!' will run the cleaner, clicking on 'ABORT' will exit the script
+Clicking on 'Clean' will run the cleaner, clicking on 'ABORT' will exit the script
 with no changes made to the database.
 
 Once users are happy that the script is working correctly, this summary can
@@ -60,6 +60,6 @@ verbose as to what it is doing.
 DISCLAIMER
 ==========
 
-Whilst every effor has been made to ensure this script works correctly, the
+Whilst every effort has been made to ensure this script works correctly, the
 authors take absolutely no responsibility for any damage caused to your database
-by it's use in any way.  ALWAYS back up your database before running this script.
+by it's use in any way.  **ALWAYS back up your database before running this script**.
