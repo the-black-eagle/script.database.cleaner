@@ -44,6 +44,10 @@ msgctxt "#32007"
 msgid "Show summary window"
 msgstr ""
 
+msgctxt "#32008"
+msgid "Show documentation at startup"
+msgstr ""
+
 msgctxt "#32010"
 msgid "Sources"
 msgstr ""

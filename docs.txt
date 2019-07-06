@@ -1,37 +1,32 @@
-Video.database.cleaner documentation
-====================================
 
-About
------
+[B][COLOR yellow]ABOUT[/COLOR][/B]
 
 Kodi's video database accumulates un-needed and un-wanted file links over time.
 
 This add-on was written to help users to clean all the rubbish out and make the
 built in 'clean library' more efficient as well as much faster.
 
-Settings
---------
+[B][COLOR yellow]SETTINGS[/COLOR][/B]
 
-General settings
-++++++++++++++++
+[B]General Settings[/B]
 
-A) Keep any pvr information
+[B]A) Keep any pvr information[/B]
 
-When enabled the add-on will not delete any references to files recorded with a 
-live-tv backend. 
+When enabled the add-on will not delete any references to files recorded with a
+live-tv backend.
 
-B) Keep bookmarked files
+[B]B) Keep bookmarked files[/B]
 
 When enabled, any files that have bookmarks will not be deleted, even if they are
 in a path that would have been deleted otherwise.
 
-C) Automatically trigger clean library
+[B]C) Automatically trigger clean library[/B]
 
-When enabled, the add-on will call Kodi's built in 'clean library' routine after it 
+When enabled, the add-on will call Kodi's built in 'clean library' routine after it
 has finished it's own cleaning.  This cleans the other tables in the database that the
 add-on doesn't touch.  It is recommended that this setting is left enabled at all times.
 
-D) Back-up local database before cleaning
+[B]D) Back-up local database before cleaning[/B]
 
 When enabled, the database will be backed up to a sub-directory in Kodi's Database directory.
 The back-up is time and date stamped in case a user wishes/needs to revert to an older database.
@@ -39,67 +34,70 @@ Optionally, it is also possible to specify a name for the back-up.  NOTE - It is
 for the add-on to back up a MySQL shared database.  Users with MySQL databases should use their
 tool of choice to manually back-up their database.  phpMyAdmin is one such tool used by the authors.
 
-E) Show summary window
+[B]E) Show summary window[/B]
 
 When enabled, a pop-up window will list various settings and paths, depending upon the options
 chosen in the add-on settings. It is possible to abort the add-on run at this point which will
-leave the database un-touched, or to select the 'Do It !!' button which will run the cleaning 
+leave the database un-touched, or to select the 'Clean' button which will run the cleaning
 routine with the chosen settings.  If this setting is disabled, the add-on will run without user
 intervention although any logs will still be created.
 
-Debug and log settings
-++++++++++++++++++++++
+[B]F) Show documentation at start-up[/B]
 
-A) Log paths to database-cleaner.log
+Shows this documentation window when database cleaner starts up.  As this could get annoying,
+the setting will turn itself OFF after the documentation window is closed.  To re-show this
+document, turn this setting back on in the addon's settings.
 
-If enabled the add-on will create a logfile in Kodi's 'temp' directory that records all the 
+[B][COLOR yellow]Debug and log settings[/COLOR][/B]
+
+[B]A) Log paths to database-cleaner.log[/B]
+
+If enabled the add-on will create a logfile in Kodi's 'temp' directory that records all the
 paths that the add-on will delete.  If 'show summary window' is enabled it is possible to stop
-the add-on by pressing the 'abort' button.  The logfile will still be created so that users can 
+the add-on by pressing the 'abort' button.  The logfile will still be created so that users can
 see what will be deleted before actually doing so.  When the add-on cleans the video database, any
 existing log will be backed-up to 'database-cleaner.old.log'.
 
-B) Log creation style
+[B]B) Log creation style[/B]
 
 Two options are available - create new log each run or add to log each run.  If the first option
 is chosen, any existing log will be deleted and replaced with a fresh log.  If the second option
 is chosen, the logfile will be added to on each run.  Logfiles are still backed-up on cleaning,
 regardless of this setting.
 
-C) Enable debugging to Kodi debug log
+[B]C) Enable debugging to Kodi debug log[/B]
 
 In normal use, the add-on writes very little to the Kodi logfile.  In the event of an error or an
 issue with using this add-on, users should first enable the systemwide Kodi debug log and enable
 this setting to produce a debug log that the authors can use to determine the cause of the error or issue.
 
-Sources
-+++++++
+[B][COLOR yellow]Sources[/COLOR][/B]
 
-A) Use sources.xml to determine files to keep
+[B]A) Use sources.xml to determine files to keep[/B]
 
 When a user scans a video source into Kodi, the path is stored in a 'sources.xml' file. Enabling
 this setting tells the add-on that any files that have been added into the video library by
 this method should not be deleted.  NOTE - Kodi should delete any files when a user removes a source
 but if this has not happened, the add-on will remove them automatically.
 
-B) Use sources.xml on this machine
+[B]B) Use sources.xml on this machine[/B]
 
 Generally, this setting should be enabled.  Users of MySQL databases do not need to have a 'sources.xml' on each
 machine that their database is shared with, because the paths are contained within the shared database.
 Such users can disable this setting and can then set the path to a 'sources.xml' on a different networked
-machine. This means MySQL users can run the add-on on any of their machines whilst only having a 
+machine. This means MySQL users can run the add-on on any of their machines whilst only having a
 'sources.xml' on one machine.
 
-Advanced
-++++++++
+[B][COLOR red]Advanced[/COLOR][/B]
 
-A) Force database name
+[B]A) Force database name[/B]
 
 If enabled, makes the add-on connect to the specified database rather than the automatically detected one.
 Useful for testing purposes to see what effect the add-on will have on a database.  NOTE - This setting
 does not alter the database that Kodi's built in 'clean library' cleans.  This setting should be
 disabled unless the user understands the implications of enabling it.
 
-B) Remove specific path from database
+[B]B) Remove specific path from database[/B]
 
 If enabled the user must enter a path to be deleted from the database.  NOTE - A wildcard will be
 appended to the end of the supplied path.  The add-on will remove the path from the files table
@@ -107,27 +105,26 @@ in the database. This setting will revert to disabled once the add-on has remove
 the database.  It is however possible, by using the summary window, to generate a logfile showing
 the details of paths to be removed by aborting the add-on at this point and viewing the log file
 that it has created.  The setting will not revert until either the summary window is disabled OR
-the 'do it !!' button is pressed.
+the 'Clean' button is pressed.
 
-C) Replace path in database
+[B]C) Replace path in database[/B]
 
-If enabled the user must specify an existing path and a new path. Any paths containing the 
-specified existing path will be renamed to the new path.  This is useful if you move a 
+If enabled the user must specify an existing path and a new path. Any paths containing the
+specified existing path will be renamed to the new path.  This is useful if you move a
 directory on disk but do not want to remove and re-scan the source in Kodi. The add-on
 generates the list of paths by appending a wildcard to the supplied 'old path'.  This means that
 a supplied path of 'nfs://OLD_SERVER' will include 'nfs://OLD_SERVER/Movies' and any other
-directories in the tree. If the new path were 'nfs://NEW_SERVER' then every path starting with 
+directories in the tree. If the new path were 'nfs://NEW_SERVER' then every path starting with
 'nfs://OLD_SERVER' will become 'nfs://NEW_SERVER' eg with the Movies directory above, the path
 would become 'nfs://NEW_SERVER/Movies'. Renaming a path automatically turns off once the path
-has been renamed.  Again, it is possible by aborting the add-on in the summary window to generate a 
+has been renamed.  Again, it is possible by aborting the add-on in the summary window to generate a
 logfile showing the original path and the new path to aid users in determining if everything is correct.
-Clicking on the 'Do it !' button or turning off the summary window will rename the path(s) and turn this setting off.
+Clicking on the 'Clean' button or turning off the summary window will rename the path(s) and turn this setting off.
 
-NOTE - Paths should NOT end with a terminating slash (either '\' or '/' depending on your OS) as this will lead to 
+[B][COLOR red]NOTE[/COLOR][/B] - Paths should [B]NOT[/B] end with a terminating slash (either '\' or '/' depending on your OS) as this will lead to
 double slashes being inserted into the database.
 
-USAGE
-=====
+[B][COLOR yellow]USAGE[/COLOR][/B]
 
 To quickly remove any streaming links from your database, turn OFF 'Use sources.xml to determine files to keep'
 in the add-on's 'sources' settings.  This will remove only streaming links from your database when the add-on is
@@ -135,12 +132,11 @@ run.  No other cleaning will be done however.
 
 To run the add-on silently as a scheduled task, turn OFF 'Show summary window' in general settings.
 
-To remove old links, streaming info and general rubbish accumulated in the database, ensure that 
+To remove old links, streaming info and general rubbish accumulated in the database, ensure that
 'use sources.xml to determine files to keep' is turned ON.  If you have a PVR backend, turn on
 'keep any pvr information' otherwise all information relating to your recordings will be deleted.
 
-ADVANCED USAGE
-==============
+[B][COLOR red]ADVANCED USAGE[/COLOR][/B]
 
 The add-on can exclude user defined paths (including plugins) from the clean.  This is done by
 creating a file called 'excludes.xml' in the add-ons 'addon_data' directory.  This is located
@@ -152,8 +148,8 @@ however does not exist by default, it must be created by the user.
 The format of the 'excludes.xml' file is simple. EG
 
 <excludes>
-	<exclude>plugin://plugin.video.youtube</exclude>
-	<exclude>plugin://plugin.video.itunes_trailers</exclude>
+    <exclude>plugin://plugin.video.youtube</exclude>
+    <exclude>plugin://plugin.video.itunes_trailers</exclude>
 </excludes>
 
 The excludes.xml file must start with the <excludes> tag and end with </excludes>
@@ -169,10 +165,9 @@ Users can be as precise or as vague as they require. EG
 the itunes_trailers plugin has played. Useful if you want to maintain watched status
 for your trailers.
 
-<exclude>plugin://plugin.video.itunes_trailers/trailer/play/http%3A%2F%2Fmovietrailers.apple.com%2Fmovies%2Fdisney%2Fzootopia%2Fzootopia-tlr1_h720p.mov</exclude>
+<exclude>plugin://plugin.video.itunes_trailers/trailer/play/http%3A%2F%2Fmovietrailers.apple.com
+%2Fmovies%2Fdisney%2Fzootopia%2Fzootopia-tlr1_h720p.mov</exclude>
 keeps just that one trailer and deletes all the others.
 
-NOTE - It is possible to specify any  valid path or part of a path in the <exclude> tag
+[B]NOTE[/B] - It is possible to specify any  valid path or part of a path in the <exclude> tag
 This allows very fine control over what is removed or kept.
-
-
