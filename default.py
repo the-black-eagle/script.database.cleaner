@@ -405,7 +405,7 @@ xbmcgui.Dialog().notification(addonname, 'Starting Up', xbmcgui.NOTIFICATION_INF
 xbmc.sleep(2000)
 
 log('userdata path [%s] ' %userdata_path)
-if show_docs:
+if show_docs == True:
     mydisplay = displayDocs('cleaner-docs.xml', addonpath, 'Default', '1080i')
     mydisplay.doModal()
     del mydisplay
