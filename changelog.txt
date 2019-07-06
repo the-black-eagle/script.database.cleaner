@@ -1,3 +1,6 @@
+Version 0.6.2    06/07/19
+[Add] Display documentation on first run
+
 Version 0.6.1    01/07/19
 [Fix] Sql error when no sources are spcified or found and no other settings are enabled
 
