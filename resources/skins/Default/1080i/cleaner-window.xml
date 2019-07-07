@@ -1,283 +1,297 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!-- This skin uses some textures from Confluence -->
 <window>
-	<defaultcontrol always="true">1</defaultcontrol>
-	<coordinates>
-		<system>0</system>
-		<left>0</left>
-		<top>0</top>
-	</coordinates>
-	<animation effect="fade" time="250">WindowOpen</animation>
-	<animation effect="fade" time="250">WindowClose</animation>
-	<controls>
-		<control type="group">
-			<left>100</left>
-			<top>30</top>
+    <defaultcontrol always="true">1</defaultcontrol>
+    <coordinates>
+        <system>0</system>
+        <left>0</left>
+        <top>0</top>
+    </coordinates>
+    <animation effect="fade" time="250">WindowOpen</animation>
+    <animation effect="fade" time="250">WindowClose</animation>
+    <controls>
+        <control type="group">
+            <left>100</left>
+            <top>30</top>
 
-			<control type="image">
-				<description>background window texture</description>
-				<left>0</left>
-				<top>0</top>
-				<width>1720</width>
-				<height>1020</height>
-				<texture border="80">background.png</texture>
-				<colordiffuse>DDFFFFFF</colordiffuse>
-			</control>
-			<control type="image">
-				<description>icon</description>
-				<left>25</left>
-				<top>15</top>
-				<width>48</width>
-				<height>48</height>
-				<texture>icon.png</texture>
-			</control>
-			<control type="image">
-				<description>Title</description>
-				<left>685</left>
-				<top>15</top>
-				<width>350</width>
-				<height>55</height>
-				<texture>summary-title.png</texture>
-			</control>
-		</control>	
-		
-		<control type="textbox">
-			<description>Label for sources.xml list</description>
-			<left>220</left>
-			<top>120</top>
-			<height>30</height>
-			<width>420</width>
-			<font>font10</font>
-			<align>left</align>
-			<label>[COLOR=FFFF00FF]Keeping Data From The Following Paths[/COLOR]</label>
-		</control>
-		
-		<!-- Scrollbar for sources.xml list -->
-		
-		<control type="scrollbar" id="17">
-			<description>Scroll bar control for paths list</description>
-			<left>155</left>
-			<top>175</top>
-			<width>45</width>
-			<height>381</height>
-			<visible>true</visible>
-			<texturesliderbackground border="1,14,1,14">ScrollBarV.png</texturesliderbackground>
-			<texturesliderbar border="1,14,1,14">ScrollBarV_bar.png</texturesliderbar>
-			<texturesliderbarfocus border="1,14,1,14">ScrollBarV_bar_focus.png</texturesliderbarfocus>
-			<textureslidernib>ScrollBarNib.png</textureslidernib>
-			<textureslidernibfocus>ScrollBarNib.png</textureslidernibfocus>
-			<pulseonselect></pulseonselect>
-			<orientation>vertical</orientation>
-			<showonepage>false</showonepage>
-			<onup>17</onup>
-			<ondown>17</ondown>
-			<onleft>1</onleft>
-			<onright>1</onright>
-		</control>
-	
-		<!-- List control for sources.xml paths -->
+            <control type="image">
+                <description>background window texture</description>
+                <left>0</left>
+                <top>0</top>
+                <width>1720</width>
+                <height>1020</height>
+                <texture border="80">background.png</texture>
+                <colordiffuse>DDFFFFFF</colordiffuse>
+            </control>
+            <control type="image">
+                <description>icon</description>
+                <left>25</left>
+                <top>15</top>
+                <width>48</width>
+                <height>48</height>
+                <texture>icon.png</texture>
+            </control>
+            <control type="image">
+                <description>Title</description>
+                <left>685</left>
+                <top>15</top>
+                <width>350</width>
+                <height>55</height>
+                <texture>summary-title.png</texture>
+            </control>
+        </control>
 
-		<control type="list" id="6">	
-			<viewtype label="list_1">list</viewtype>
-			<left>180</left>
-			<top>180</top>
-			<width>700</width>
-			<height>361</height>
-			<pagecontrol>17</pagecontrol>
-			<onleft>5</onleft>
-			<onright>5</onright>
-			<onup>6</onup>
-			<ondown>6</ondown>
-			<orientation>vertical</orientation>
-			<scrolltime tween="Quadratic" easing="Out">1000</scrolltime>
-			<autoscroll>false</autoscroll>
-			<preloaditems>2</preloaditems>
-			<animation effect="fade" start="100" end="50" time="200" >Conditional</animation>
-			<itemlayout height="30">
-				<control type="label">
-					<left>68</left>
-					<top>0</top>
-					<width>650</width>
-					<height>28</height>
-					<font>font10</font>
-					<aligny>center</aligny>
-					<label>$INFO[ListItem.Label]</label>
-				</control>
-			</itemlayout>
-			<focusedlayout height="30">
-				<control type="label">
-					<left>68</left>
-					<top>0</top>
-					<width>650</width>
-					<height>28</height>
-					<font>font10</font>
-					<aligny>center</aligny>
-					<label>$INFO[ListItem.Label]</label>
-				</control>
-			</focusedlayout>
-		</control>
-		
-		<!-- Title for excludes.xml listbox -->
-		
-		<control type="textbox">
-			<description>Label for excludes.xml list</description>
-			<left>1080</left>
-			<top>120</top>
-			<height>30</height>
-			<width>400</width>
-			<font>font10</font>
-			<label>[COLOR=FFFF00FF]Contents of 'excludes.xml'[/COLOR]</label>
-		</control>
-		
-		<!-- List control for excludes.xml -->
-		
-		<control type="list" id="8">	
-			<viewtype label="list_2">list</viewtype>
-			<left>1080</left>
-			<top>180</top>
-			<width>700</width>
-			<height>151</height>
-			<pagecontrol>61</pagecontrol>
-			<onleft>5</onleft>
-			<onright>5</onright>
-			<onup>6</onup>
-			<ondown>6</ondown>
-			<orientation>vertical</orientation>
-			<autoscroll delay="500" time="1000" repeat="800">true</autoscroll>
-			<preloaditems>2</preloaditems>
-			<animation effect="fade" start="100" end="50" time="200">Conditional</animation>
-			<itemlayout height="30">
-				<control type="label">
-					<left>68</left>
-					<top>0</top>
-					<width>400</width>
-					<height>28</height>
-					<font>font10</font>
-					<aligny>center</aligny>
-					<label>$INFO[ListItem.Label]</label>
-				</control>
-				
-			</itemlayout>
-			<focusedlayout height="30">
-				<control type="label">
-					<left>68</left>
-					<top>0</top>
-					<width>400</width>
-					<height>28</height>
-					<font>font10</font>
-					<aligny>center</aligny>
-					<label>$INFO[ListItem.Label]</label>
-				</control>
-				
-			</focusedlayout>
-		</control>
-		
-		<control type="textbox">
-			<description>Label for addon settings list</description>
-			<left>1080</left>
-			<top>335</top>
-			<height>30</height>
-			<width>380</width>
-			<font>font10</font>
-			<scroll>true</scroll>
-			<align>left</align>
-			<label>[COLOR=FFFF00FF]Addon Settings[/COLOR]</label>
-		</control>
-		
-		<!-- List control for Addon Settings -->
-		
-				<control type="list" id="10">	
-			<viewtype label="list_3">list</viewtype>
-			<left>1080</left>
-			<top>380</top>
-			<width>700</width>
-			<height>301</height>
-			<pagecontrol>61</pagecontrol>
-			<onleft>5</onleft>
-			<onright>5</onright>
-			<onup>6</onup>
-			<ondown>6</ondown>
-			<orientation>vertical</orientation>
-			<autoscroll delay="500" time="1000" repeat="800">true</autoscroll>
-			<preloaditems>2</preloaditems>
-			<animation effect="fade" start="100" end="50" time="200">Conditional</animation>
-			<itemlayout height="30">
-				<control type="label">
-					<left>68</left>
-					<top>0</top>
-					<width>400</width>
-					<height>28</height>
-					<font>font10</font>
-					<aligny>center</aligny>
-					<label>$INFO[ListItem.Label]</label>
-				</control>
-				
-			</itemlayout>
-			<focusedlayout height="30">
-				<control type="label">
-					<left>68</left>
-					<top>0</top>
-					<width>400</width>
-					<height>28</height>
-					<font>font10</font>
-					<aligny>center</aligny>
-					<label>$INFO[ListItem.Label]</label>
-				</control>
-				
-			</focusedlayout>
-		</control>
-		
-		<!-- Warnings -->
-		
-		<control type="label" id="20">
-			<left>200</left>
-			<top>800</top>
-			<width>auto</width>
-			<height>28</height>
-			<font>font10</font>
-			<aligny>center</aligny>
-			<label>-</label>
-		</control>
-		
-		<control type="label" id="21">
-			<left>200</left>
-			<top>830</top>
-			<width>auto</width>
-			<height>28</height>
-			<font>font10</font>
-			<aligny>center</aligny>
-			<label>-</label>
-		</control>
-		
-		<!--  Clean and Abort Buttons -->
-		
-		<control type="button" id="1">
-			<description>Abort button</description>
-			<top>950</top>
-			<left>500</left>
-			<width>100</width>
-			<height>43</height>
-			<texturefocus colordiffuse="FFFFAAFF">button_abort.png</texturefocus>
-			<texturenofocus colordiffuse="FF444444">button_abort_ns.png</texturenofocus>
-			<onup>17</onup>
-			<ondown>2</ondown>
-			<onleft>2</onleft>
-			<onright>2</onright>
-			<pulseonselect>true</pulseonselect>
-		</control>	
-		<control type="button" id="2">
-			<description>Clean button</description>
-			<top>950</top>
-			<left>1300</left>
-			<width>100</width>
-			<height>43</height>
-			<texturefocus colordiffuse="FFFFAAFF">button_clean.png</texturefocus>
-			<texturenofocus colordiffuse="FF444444">button_clean_ns.png</texturenofocus>
-			<onup>17</onup>
-			<ondown>1</ondown>
-			<onleft>1</onleft>
-			<onright>1</onright>
-			<pulseonselect>true</pulseonselect>
-		</control>
-	</controls>
+        <control type="textbox">
+            <description>Label for sources.xml list</description>
+            <left>220</left>
+            <top>120</top>
+            <height>30</height>
+            <width>420</width>
+            <font>font10</font>
+            <align>left</align>
+            <label>[COLOR=FFFF00FF]Keeping Data From The Following Paths[/COLOR]</label>
+        </control>
+
+        <!-- Scrollbar for sources.xml list -->
+
+        <control type="scrollbar" id="17">
+            <description>Scroll bar control for paths list</description>
+            <left>155</left>
+            <top>175</top>
+            <width>45</width>
+            <height>381</height>
+            <visible>true</visible>
+            <texturesliderbackground border="1,14,1,14">ScrollBarV.png</texturesliderbackground>
+            <texturesliderbar border="1,14,1,14">ScrollBarV_bar.png</texturesliderbar>
+            <texturesliderbarfocus border="1,14,1,14">ScrollBarV_bar_focus.png</texturesliderbarfocus>
+            <textureslidernib>ScrollBarNib.png</textureslidernib>
+            <textureslidernibfocus>ScrollBarNib.png</textureslidernibfocus>
+            <pulseonselect></pulseonselect>
+            <orientation>vertical</orientation>
+            <showonepage>false</showonepage>
+            <onup>17</onup>
+            <ondown>17</ondown>
+            <onleft>1</onleft>
+            <onright>1</onright>
+        </control>
+
+        <!-- List control for sources.xml paths -->
+
+        <control type="list" id="6">
+            <viewtype label="list_1">list</viewtype>
+            <left>180</left>
+            <top>180</top>
+            <width>700</width>
+            <height>361</height>
+            <pagecontrol>17</pagecontrol>
+            <onleft>5</onleft>
+            <onright>5</onright>
+            <onup>6</onup>
+            <ondown>6</ondown>
+            <orientation>vertical</orientation>
+            <scrolltime tween="Quadratic" easing="Out">1000</scrolltime>
+            <autoscroll>false</autoscroll>
+            <preloaditems>2</preloaditems>
+            <animation effect="fade" start="100" end="50" time="200" >Conditional</animation>
+            <itemlayout height="30">
+                <control type="label">
+                    <left>68</left>
+                    <top>0</top>
+                    <width>650</width>
+                    <height>28</height>
+                    <font>font10</font>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+            </itemlayout>
+            <focusedlayout height="30">
+                <control type="label">
+                    <left>68</left>
+                    <top>0</top>
+                    <width>650</width>
+                    <height>28</height>
+                    <font>font10</font>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+            </focusedlayout>
+        </control>
+
+        <!-- Title for excludes.xml listbox -->
+
+        <control type="textbox">
+            <description>Label for excludes.xml list</description>
+            <left>1080</left>
+            <top>120</top>
+            <height>30</height>
+            <width>400</width>
+            <font>font10</font>
+            <label>[COLOR=FFFF00FF]Contents of 'excludes.xml'[/COLOR]</label>
+        </control>
+
+        <!-- List control for excludes.xml -->
+
+        <control type="list" id="8">
+            <viewtype label="list_2">list</viewtype>
+            <left>1080</left>
+            <top>180</top>
+            <width>700</width>
+            <height>151</height>
+            <pagecontrol>61</pagecontrol>
+            <onleft>5</onleft>
+            <onright>5</onright>
+            <onup>6</onup>
+            <ondown>6</ondown>
+            <orientation>vertical</orientation>
+            <autoscroll delay="500" time="1000" repeat="800">true</autoscroll>
+            <preloaditems>2</preloaditems>
+            <animation effect="fade" start="100" end="50" time="200">Conditional</animation>
+            <itemlayout height="30">
+                <control type="label">
+                    <left>68</left>
+                    <top>0</top>
+                    <width>400</width>
+                    <height>28</height>
+                    <font>font10</font>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+
+            </itemlayout>
+            <focusedlayout height="30">
+                <control type="label">
+                    <left>68</left>
+                    <top>0</top>
+                    <width>400</width>
+                    <height>28</height>
+                    <font>font10</font>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+
+            </focusedlayout>
+        </control>
+
+        <control type="textbox">
+            <description>Label for addon settings list</description>
+            <left>1080</left>
+            <top>335</top>
+            <height>30</height>
+            <width>380</width>
+            <font>font10</font>
+            <scroll>true</scroll>
+            <align>left</align>
+            <label>[COLOR=FFFF00FF]Addon Settings[/COLOR]</label>
+        </control>
+
+        <!-- List control for Addon Settings -->
+
+                <control type="list" id="10">
+            <viewtype label="list_3">list</viewtype>
+            <left>1080</left>
+            <top>380</top>
+            <width>700</width>
+            <height>301</height>
+            <pagecontrol>61</pagecontrol>
+            <onleft>5</onleft>
+            <onright>5</onright>
+            <onup>6</onup>
+            <ondown>6</ondown>
+            <orientation>vertical</orientation>
+            <autoscroll delay="500" time="1000" repeat="800">true</autoscroll>
+            <preloaditems>2</preloaditems>
+            <animation effect="fade" start="100" end="50" time="200">Conditional</animation>
+            <itemlayout height="30">
+                <control type="label">
+                    <left>68</left>
+                    <top>0</top>
+                    <width>400</width>
+                    <height>28</height>
+                    <font>font10</font>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+
+            </itemlayout>
+            <focusedlayout height="30">
+                <control type="label">
+                    <left>68</left>
+                    <top>0</top>
+                    <width>400</width>
+                    <height>28</height>
+                    <font>font10</font>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+
+            </focusedlayout>
+        </control>
+
+        <!-- Warnings -->
+
+        <control type="label" id="20">
+            <left>200</left>
+            <top>800</top>
+            <width>auto</width>
+            <height>28</height>
+            <font>font10</font>
+            <aligny>center</aligny>
+            <label>-</label>
+        </control>
+
+        <control type="label" id="21">
+            <left>200</left>
+            <top>830</top>
+            <width>auto</width>
+            <height>28</height>
+            <font>font10</font>
+            <aligny>center</aligny>
+            <label>-</label>
+        </control>
+
+        <!--  Clean and Abort Buttons -->
+
+        <control type="button" id="1">
+            <description>Abort button</description>
+            <top>950</top>
+            <left>500</left>
+            <width>100</width>
+            <height>43</height>
+            <texturefocus colordiffuse="FFFFAAFF">button_abort.png</texturefocus>
+            <texturenofocus colordiffuse="FF444444">button_abort_ns.png</texturenofocus>
+            <onup>17</onup>
+            <ondown></ondown>
+            <onleft>2</onleft>
+            <onright>3</onright>
+            <pulseonselect>true</pulseonselect>
+        </control>
+        <control type="button" id="2">
+            <description>Clean button</description>
+            <top>950</top>
+            <left>1300</left>
+            <width>100</width>
+            <height>43</height>
+            <texturefocus colordiffuse="FFFFAAFF">button_clean.png</texturefocus>
+            <texturenofocus colordiffuse="FF444444">button_clean_ns.png</texturenofocus>
+            <onup>17</onup>
+            <ondown></ondown>
+            <onleft>3</onleft>
+            <onright>1</onright>
+            <pulseonselect>true</pulseonselect>
+        </control>
+        <control type="button" id="3">
+            <description>Show log button</description>
+            <top>950</top>
+            <left>900</left>
+            <width>100</width>
+            <height>43</height>
+            <texturefocus colordiffuse="FFFFAAFF">button_show-log.png</texturefocus>
+            <texturenofocus colordiffuse="FF444444">button_show-log_ns.png</texturenofocus>
+            <onup>17</onup>
+            <ondown></ondown>
+            <onleft>1</onleft>
+            <onright>2</onright>
+            <pulseonselect>true</pulseonselect>
+        </control>
+    </controls>
 </window>

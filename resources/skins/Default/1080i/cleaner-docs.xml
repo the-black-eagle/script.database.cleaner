@@ -106,6 +106,7 @@
             <onleft>4</onleft>
             <onright>1</onright>
             <pulseonselect></pulseonselect>
+            <visible>String.IsEqual(window(10000).Property(database-cleaner),docs)</visible>
         </control>
         <control type="button" id="3">
             <description>page down button</description>

@@ -59,6 +59,7 @@ ACTION_NAV_BACK = 92
 ACTION_MOUSE_LEFT_CLICK = 100
 flag = 0
 WINDOW = xbmcgui.Window(10000)
+global flag
 
 class displayDocs(xbmcgui.WindowXMLDialog):
     def __init__( self, *args, **kwargs ):
@@ -67,6 +68,8 @@ class displayDocs(xbmcgui.WindowXMLDialog):
     def onInit( self ):
         log(userdata_path)
         content_path = xbmc.translatePath('special://home/addons/script.database.cleaner/docs.txt').decode('utf-8')
+        if flag == 2:  # display log file rather than docs
+            content_path = xbmc.translatePath('special://temp/database-cleaner.log').decode('utf-8')
         dbglog(content_path)
         docfile = xbmcvfs.File(content_path)
         contents = docfile.read()
@@ -76,7 +79,7 @@ class displayDocs(xbmcgui.WindowXMLDialog):
         self.docbox.setText(contents)
 
     def onAction(self, action):
-        global flag
+
         dbglog('Got an action %s' % action.getId())
         if ( action == ACTION_PREVIOUS_MENU ) or ( action == ACTION_NAV_BACK ):
             self.close()
@@ -203,6 +206,10 @@ class MyClass(xbmcgui.WindowXMLDialog):
                 dbglog('you pressed clean')
                 flag = 1
                 self.close()
+            elif btn_id == 3:
+                dbglog('Show cleaner log')
+                flag = 2
+                self.close()
 
 #  Set some variables ###
 
@@ -220,10 +227,10 @@ bp_logfile_path = xbmc.translatePath('special://temp/bp-debuglog.log').decode('u
 type_of_log =''
 show_docs = addon.getSetting('showdocs')
 if show_docs == 'true':
-    show_docs = 'True'
+    show_docs = True
     addon.setSetting('showdocs','false')
 else:
-    show_docs = None
+    show_docs = False
 is_pvr = addon.getSetting('pvr')
 autoclean = addon.getSetting('autoclean')
 bookmarks = addon.getSetting('bookmark')
@@ -406,6 +413,7 @@ xbmc.sleep(2000)
 
 log('userdata path [%s] ' %userdata_path)
 if show_docs:
+    WINDOW.setProperty('database-cleaner','docs')
     mydisplay = displayDocs('cleaner-docs.xml', addonpath, 'Default', '1080i')
     mydisplay.doModal()
     del mydisplay
@@ -739,6 +747,19 @@ if promptdelete:
     del mydisplay
     if flag == 1:
         i = True
+    elif flag == 2:
+        while flag == 2:
+            WINDOW.setProperty('database-cleaner','log-file')
+            mydisplay = displayDocs('cleaner-docs.xml', addonpath, 'Default', '1080i')
+            mydisplay.doModal()
+            del mydisplay
+            mydisplay = MyClass('cleaner-window.xml', addonpath, 'Default', '1080i')
+            mydisplay.doModal()
+            del mydisplay
+        if flag == 1:
+            i = True
+        else:
+            i = False
     else:
         i = False
 
