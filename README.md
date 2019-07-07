@@ -15,7 +15,8 @@ their database.
 Users can also choose (via the add-on settings) to retain or remove old 
 PVR information and to retain or remove bookmarks.  As of V0.5.5 all the different
 settings are documented in the file **docs.txt** which is included with the add-on
-and can be found in the add-on's directory.
+and can be found in the add-on's directory and will be displayed upon the first run.
+There is a setting that can re-enable display of the documentation.
 
 When run, the script will prompt with a summary window containing a list
 of the paths to retain in the database. Users are encouraged to check that 
@@ -24,7 +25,7 @@ are also displayed, along with the contents of any 'excludes.xml' file.
 The name of the currently connected database is also displayed.
 If you are using MySQL, there will also be a warning to back up your database
 manually.  You have the option to either abort the script, or to clean the database. 
-Clicking on 'DO IT !!' will run the cleaner, clicking on 'ABORT' will exit the script
+Clicking on 'Clean' will run the cleaner, clicking on 'ABORT' will exit the script
 with no changes made to the database.
 
 Once users are happy that the script is working correctly, this summary can
