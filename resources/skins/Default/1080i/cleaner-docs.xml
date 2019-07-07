@@ -37,6 +37,16 @@
                 <width>350</width>
                 <height>55</height>
                 <texture>doc-title.png</texture>
+                <visible>String.IsEqual(window(10000).Property(database-cleaner),docs)</visible>
+            </control>
+            <control type="image">
+                <description>Title</description>
+                <left>685</left>
+                <top>15</top>
+                <width>350</width>
+                <height>55</height>
+                <texture>logfile-title.png</texture>
+                <visible>String.IsEqual(window(10000).Property(database-cleaner),log-file)</visible>
             </control>
         </control>
 
